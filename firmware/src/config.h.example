@@ -11,8 +11,11 @@
 // Liefert den aktuellen Zustand der Reise als JSON, z.B.:
 //   { "currentStation": 2, "totalStations": 5 }
 #define API_URL         "http://verstehbahnhof-cache.local/api/status"
-#define API_POLL_MS     5000    // wie oft pollen
-#define API_TIMEOUT_MS  1500    // HTTP-Timeout (kurz halten, sonst stockt Animation)
+// Die Firmware pollt nicht mehr zeitgesteuert: der API-Call passiert
+// nur dann, wenn der Zug am nächsten (roten) Bahnhof angekommen ist.
+// Der HTTP-Timeout sollte trotzdem kurz sein, sonst "hängt" der Zug am
+// Wendepunkt sichtbar bis zur Antwort.
+#define API_TIMEOUT_MS  1500
 
 // --- NeoPixel ---
 // D2 am Wemos D1 Mini (Lite) == GPIO4 (sicherer Pin, keine Boot-Konflikte)

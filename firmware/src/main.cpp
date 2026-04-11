@@ -78,6 +78,9 @@ uint32_t wagonColor(int idx /* 1..NUM_WAGONS */) {
         (uint8_t)(base_b * f));
 }
 
+// Forward-Declaration (tickTrainAnimation ruft pollApiAndUpdate auf)
+void pollApiAndUpdate();
+
 // -------- Zustand --------
 int currentStation = -1;  // letzter bekannter Bahnhof (−1 = noch nix)
 int trainPos = 0;          // aktuelle LED-Position des Zugs
@@ -171,15 +174,24 @@ void tickTrainAnimation() {
     }
 
     trainPos += trainDir;
+    bool reachedNext = false;
     if (trainPos >= maxPos) {
         trainPos = maxPos;
         trainDir = -1;
+        reachedNext = true;  // wir stehen vorm nächsten (roten) Bahnhof
     } else if (trainPos <= minPos) {
         trainPos = minPos;
         trainDir = +1;
     }
 
     drawTrainWithWagons(trainPos, trainDir, ledA, ledB);
+
+    // Am Wendepunkt vor dem nächsten roten Bahnhof: API fragen, ob es
+    // inzwischen weitergeht. Das ist der einzige Zeitpunkt, an dem die
+    // Firmware pollt – kein Zeittakt.
+    if (reachedNext) {
+        pollApiAndUpdate();
+    }
 }
 
 // -------- Netzwerk --------
@@ -231,6 +243,28 @@ int fetchCurrentStation() {
     return doc["currentStation"] | -1;
 }
 
+// Holt den Status von der API und übernimmt ihn, falls sich etwas geändert
+// hat. Wird genau dann aufgerufen, wenn der Zug am "nächsten" (roten)
+// Bahnhof angekommen ist – nicht zeitgesteuert.
+void pollApiAndUpdate() {
+    Serial.println("API: check…");
+    int s = fetchCurrentStation();
+    if (s < 0 || s >= (int)NUM_STATIONS) return;
+    if (s == currentStation) return;
+
+    const int prev = currentStation;
+    currentStation = s;
+    Serial.printf("Bahnhof: %d (%s)\n",
+                  currentStation, STATION_NAMES[currentStation]);
+
+    resetTrainToCurrent();
+
+    if (currentStation == (int)NUM_STATIONS - 1 && prev != currentStation) {
+        Serial.println("Augsburg erreicht!");
+        arrivalAnimation();
+    }
+}
+
 // -------- Setup / Loop --------
 
 void setup() {
@@ -244,34 +278,18 @@ void setup() {
     strip.show();
 
     connectWifi();
+
+    // Einmalige Initialabfrage, damit wir nicht erst auf den ersten
+    // Pendel-Wendepunkt warten müssen.
+    pollApiAndUpdate();
 }
 
 void loop() {
     const unsigned long now = millis();
 
-    // --- API-Polling ---
-    static unsigned long lastPoll = 0;
-    if (now - lastPoll >= API_POLL_MS) {
-        lastPoll = now;
-        int s = fetchCurrentStation();
-        if (s >= 0 && s < (int)NUM_STATIONS && s != currentStation) {
-            const int prev = currentStation;
-            currentStation = s;
-            Serial.printf("Bahnhof: %d (%s)\n",
-                          currentStation, STATION_NAMES[currentStation]);
-
-            // Zug auf den neuen Bahnhof setzen und von dort aus pendeln
-            resetTrainToCurrent();
-
-            // Ziel erreicht? → Ankunfts-Show
-            if (currentStation == (int)NUM_STATIONS - 1 && prev != currentStation) {
-                Serial.println("Augsburg erreicht!");
-                arrivalAnimation();
-            }
-        }
-    }
-
-    // --- Zug-Animation (pendelt zwischen currentStation und currentStation+1) ---
+    // Nur noch die Zug-Animation zeittakten. Der API-Abruf passiert
+    // ausschließlich in tickTrainAnimation(), sobald der Zug am
+    // nächsten (roten) Bahnhof ankommt.
     static unsigned long lastFrame = 0;
     if (now - lastFrame >= TRAIN_FRAME_MS) {
         lastFrame = now;
