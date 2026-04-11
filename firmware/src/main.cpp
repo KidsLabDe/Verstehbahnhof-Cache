@@ -34,7 +34,7 @@
 #define API_TIMEOUT_MS 1500
 #endif
 #ifndef ATTRACT_POLL_MS
-#define ATTRACT_POLL_MS 3000
+#define ATTRACT_POLL_MS 10000
 #endif
 #ifndef FIRE_COOLING
 #define FIRE_COOLING 55

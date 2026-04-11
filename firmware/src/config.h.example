@@ -34,7 +34,7 @@
 
 // --- Attract-Animation (Feuer + Feuerwerk, wenn noch niemand den
 //     Initial-QR gescannt hat, d.h. state < 0) ---
-#define ATTRACT_POLL_MS    3000   // wie oft während Attract die API fragen
+#define ATTRACT_POLL_MS    10000  // wie oft während Attract die API fragen
 #define FIRE_COOLING       55     // Fire2012 Abkühlrate (höher = dunkler)
 #define FIRE_SPARKING      120    // Zündwahrscheinlichkeit 0..255
 #define MAX_BURSTS         6      // gleichzeitige Feuerwerks-Bursts
