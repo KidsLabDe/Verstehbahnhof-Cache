@@ -19,8 +19,10 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <WiFiClient.h>
+#include <WiFiClientSecureBearSSL.h>
 #include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
+#include <string.h>
 
 #include "config.h"
 
@@ -216,13 +218,31 @@ void connectWifi() {
     }
 }
 
-// Holt currentStation von der API. Gibt -1 bei Fehler zurück.
+// Holt den State von MatzEs API (GET API_URL → {"state": N, ...}).
+// Unterstützt http und https (https via BearSSL, Cert-Check deaktiviert:
+// das Public-State ist öffentlich, und dem ESP8266 fehlt eh ein sinnvoller
+// Cert-Store). Gibt -1 bei Fehler zurück.
 int fetchCurrentStation() {
     if (WiFi.status() != WL_CONNECTED) return -1;
 
-    WiFiClient client;
+    const bool isHttps = (strncmp(API_URL, "https://", 8) == 0);
+
     HTTPClient http;
-    http.begin(client, API_URL);
+    std::unique_ptr<BearSSL::WiFiClientSecure> secureClient;
+    WiFiClient plainClient;
+    bool began = false;
+
+    if (isHttps) {
+        secureClient.reset(new BearSSL::WiFiClientSecure());
+        secureClient->setInsecure();  // kein Cert-Check – Daten sind öffentlich
+        began = http.begin(*secureClient, API_URL);
+    } else {
+        began = http.begin(plainClient, API_URL);
+    }
+    if (!began) {
+        Serial.println("API: http.begin() fehlgeschlagen");
+        return -1;
+    }
     http.setTimeout(API_TIMEOUT_MS);
 
     int code = http.GET();
@@ -240,7 +260,8 @@ int fetchCurrentStation() {
         return -1;
     }
 
-    return doc["currentStation"] | -1;
+    // MatzEs API liefert das Feld "state" (0..totalStations-1)
+    return doc["state"] | -1;
 }
 
 // Holt den Status von der API und übernimmt ihn, falls sich etwas geändert
