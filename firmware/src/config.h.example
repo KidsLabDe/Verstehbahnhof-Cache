@@ -10,13 +10,14 @@
 // --- API (MatzE) ---
 // Liefert den aktuellen Zustand der Reise als JSON, z.B.:
 //   { "state": 2, "station": "repair_cafe", "last_activity": "…" }
-// https wird unterstützt (BearSSL, Cert-Check deaktiviert).
-#define API_URL         "https://verstehbahnhof.kidslab.de/state"
+// Traefik liefert /state zusätzlich plain über http aus (siehe
+// docker-compose.yml), damit wir auf dem ESP8266 kein BearSSL brauchen.
+#define API_URL         "http://verstehbahnhof.kidslab.de/state"
 // Die Firmware pollt nicht mehr zeitgesteuert: der API-Call passiert
 // nur dann, wenn der Zug am nächsten (roten) Bahnhof angekommen ist.
 // Der HTTP-Timeout sollte trotzdem kurz sein, sonst "hängt" der Zug am
 // Wendepunkt sichtbar bis zur Antwort.
-#define API_TIMEOUT_MS  2500  // HTTPS + BearSSL-Handshake braucht etwas länger
+#define API_TIMEOUT_MS  1500
 
 // --- NeoPixel ---
 // D2 am Wemos D1 Mini (Lite) == GPIO4 (sicherer Pin, keine Boot-Konflikte)
