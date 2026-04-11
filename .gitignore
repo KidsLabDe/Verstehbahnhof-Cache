@@ -1,6 +1,5 @@
 .DS_Store
 firmware/src/config.h
-.env
 .vscode/
 .idea/
 build/
