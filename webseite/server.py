@@ -182,6 +182,21 @@ def aufgabe_lore():
     return render_template("aufgabe_l0r3nf4hrt_b3q.html")
 
 
+@app.route("/reset")
+def reset():
+    # Bestätigungs-Zwischenseite; der eigentliche Reset passiert erst
+    # auf /reset/confirm, damit versehentliches Klicken oder Prefetching
+    # nicht den Spielstand zerschießt.
+    return render_template("reset.html")
+
+
+@app.route("/reset/confirm")
+def reset_confirm():
+    fresh = _fresh()
+    save_state(fresh)
+    return render_template("reset_done.html")
+
+
 @app.route("/state")
 def state():
     data = get_state()

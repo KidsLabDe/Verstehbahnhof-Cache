@@ -182,4 +182,23 @@
 
 {% endif %}
 
+{# --- Reset-Option (immer sichtbar, aber nur auf Startseite und Finale
+      prominenter platzieren) --- #}
+{% if kind == "started" or kind == "arrived" %}
+<div class="card" style="text-align:center;">
+  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">
+    {% if kind == "started" %}
+      Spielt gerade jemand anders und ihr wollt neu anfangen?
+    {% else %}
+      Nächste Gruppe dran?
+    {% endif %}
+  </p>
+  <p>
+    <a href="/reset" style="color:var(--muted);text-decoration:underline;font-size:0.8rem;">
+      Spielstand zurücksetzen
+    </a>
+  </p>
+</div>
+{% endif %}
+
 {% endblock %}
