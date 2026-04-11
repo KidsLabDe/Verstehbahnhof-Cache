@@ -1,0 +1,12 @@
+services:
+  webseite:
+    build: ./webseite
+    ports:
+      - "5000:5000"
+    volumes:
+      - state:/app/state
+    environment:
+      - STATE_DIR=/app/state
+
+volumes:
+  state:

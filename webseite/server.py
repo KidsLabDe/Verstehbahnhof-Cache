@@ -5,7 +5,9 @@ from flask import Flask, render_template, jsonify, redirect
 
 app = Flask(__name__)
 
-STATE_FILE = os.path.join(os.path.dirname(__file__), "state.json")
+_data_dir = os.environ.get("STATE_DIR", os.path.dirname(__file__))
+os.makedirs(_data_dir, exist_ok=True)
+STATE_FILE = os.path.join(_data_dir, "state.json")
 INACTIVITY_TIMEOUT = timedelta(minutes=30)
 
 STATION_NAMES = {
