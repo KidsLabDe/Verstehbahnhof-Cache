@@ -5,8 +5,10 @@ services:
     restart: unless-stopped
     volumes:
       - state:/app/state
+      - log:/app/log
     environment:
       - STATE_DIR=/app/state
+      - LOG_DIR=/app/log
     networks:
       - proxy
     labels:
@@ -36,6 +38,7 @@ services:
 
 volumes:
   state:
+  log:
 
 networks:
   proxy:

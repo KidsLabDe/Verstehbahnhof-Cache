@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Danke, {{ name }}!{% endblock %}
+{% block header_title %}Logbuch{% endblock %}
+
+{% block extra_style %}
+.quote {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 1rem;
+  color: var(--text);
+  font-style: italic;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+}
+.btn-row { display: flex; gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-label">Eingetragen</div>
+  <h2>Danke, {{ name }}!</h2>
+  <p>
+    Dein Gruß ist jetzt Teil von Emmas Reisebuch. Jim Knopf schmunzelt
+    und winkt dir aus Augsburg zu.
+  </p>
+  <div class="quote">{{ comment }}</div>
+</div>
+
+<div class="card">
+  <div class="card-label">Nächste Runde?</div>
+  <p>
+    Wenn eine neue Gruppe das Spiel von vorne spielen möchte, kannst du
+    den Spielstand jetzt zurücksetzen.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/reset">Spielstand zurücksetzen</a>
+    <a class="btn" href="/aufgabe_st4rt_v9p">Zurück zum Finale</a>
+  </div>
+</div>
+{% endblock %}

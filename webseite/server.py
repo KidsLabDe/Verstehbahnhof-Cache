@@ -1,7 +1,8 @@
 import json
 import os
+import sys
 from datetime import datetime, timedelta
-from flask import Flask, render_template, jsonify, redirect
+from flask import Flask, render_template, jsonify, redirect, request
 
 app = Flask(__name__)
 
@@ -9,6 +10,37 @@ _data_dir = os.environ.get("STATE_DIR", os.path.dirname(__file__))
 os.makedirs(_data_dir, exist_ok=True)
 STATE_FILE = os.path.join(_data_dir, "state.json")
 INACTIVITY_TIMEOUT = timedelta(minutes=15)
+
+# -------- Logging --------
+#
+# Daily rotating log files in LOG_DIR/YYYY-MM-DD.log. Eigene kleine
+# Implementierung, weil wir _wirklich_ Dateien im Format yyyy-mm-dd.log
+# haben wollen (nicht cache.log.2026-04-11 wie bei TimedRotatingFileHandler).
+# Gibt den Output zusätzlich auf stdout aus, damit `docker compose logs`
+# live mitliest.
+
+LOG_DIR = os.environ.get("LOG_DIR", os.path.join(_data_dir, "log"))
+os.makedirs(LOG_DIR, exist_ok=True)
+LOGBOOK_FILE = os.path.join(LOG_DIR, "logbook.jsonl")
+
+
+def log_event(level, event, **fields):
+    ts = datetime.now().isoformat(timespec="seconds")
+    extras = " ".join(f"{k}={json.dumps(v, ensure_ascii=False)}"
+                      for k, v in fields.items())
+    line = f"{ts} {level:5s} {event}"
+    if extras:
+        line += " " + extras
+    line += "\n"
+
+    try:
+        path = os.path.join(LOG_DIR, datetime.now().strftime("%Y-%m-%d") + ".log")
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(line)
+    except Exception as exc:  # Log-Failures dürfen den Request nicht killen
+        print(f"[log-error] {exc}", file=sys.stderr, flush=True)
+
+    print(line, end="", flush=True)
 
 # Bahnhof-Indizes (müssen zur Firmware-Reihenfolge passen)
 IDLE = -1
@@ -68,6 +100,9 @@ def get_state():
     data = load_state()
     last = datetime.fromisoformat(data["last_activity"])
     if datetime.now() - last > INACTIVITY_TIMEOUT:
+        log_event("INFO", "inactivity_reset",
+                  prev_station=data.get("station"),
+                  prev_task_done=data.get("task_done"))
         data = _fresh()
         save_state(data)
     return data
@@ -87,14 +122,20 @@ def mark_task_done(required_station):
     """Markiert die Task am required_station als erledigt. Wenn der
     Spieler nicht dort ist, passiert nichts außer einem touch."""
     data = get_state()
-    if data["station"] == required_station and not data["task_done"]:
+    matched = (data["station"] == required_station and not data["task_done"])
+    if matched:
         data["task_done"] = True
     data["last_activity"] = datetime.now().isoformat()
     save_state(data)
+    log_event("INFO", "task_scan",
+              required=required_station,
+              current=data["station"],
+              matched=matched,
+              task_done=data["task_done"])
     return data
 
 
-def scan_start_qr():
+def scan_start_qr_impl():
     """Der Start-QR hat mehrere Bedeutungen, je nach aktuellem Zustand:
 
     - Idle (niemand hat gespielt): Spiel starten, Station → Fürstenberg
@@ -132,6 +173,13 @@ def scan_start_qr():
     # Task noch offen, aktueller Bahnhof
     data = touch(data)
     return data, "pending"
+
+
+def scan_start_qr():
+    data, kind = scan_start_qr_impl()
+    log_event("INFO", "start_qr_scan", kind=kind,
+              station=data["station"], task_done=data["task_done"])
+    return data, kind
 
 
 # -------- Routes --------
@@ -192,9 +240,38 @@ def reset():
 
 @app.route("/reset/confirm")
 def reset_confirm():
+    before = load_state()
     fresh = _fresh()
     save_state(fresh)
+    log_event("INFO", "manual_reset",
+              prev_station=before.get("station"),
+              prev_task_done=before.get("task_done"))
     return render_template("reset_done.html")
+
+
+@app.route("/logbook", methods=["POST"])
+def logbook_submit():
+    name = (request.form.get("name") or "").strip()[:100]
+    comment = (request.form.get("comment") or "").strip()[:2000]
+    if not name or not comment:
+        log_event("WARN", "logbook_rejected",
+                  reason="empty", has_name=bool(name), has_comment=bool(comment))
+        return redirect("/aufgabe_st4rt_v9p")
+
+    entry = {
+        "timestamp": datetime.now().isoformat(timespec="seconds"),
+        "name": name,
+        "comment": comment,
+    }
+    try:
+        with open(LOGBOOK_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as exc:
+        log_event("ERROR", "logbook_write_failed", error=str(exc))
+
+    log_event("INFO", "logbook_entry",
+              name=name, comment_len=len(comment))
+    return render_template("logbook_thanks.html", name=name, comment=comment)
 
 
 @app.route("/state")
@@ -206,6 +283,11 @@ def state():
         "station_name": STATION_NAMES.get(data["station"], "unknown"),
         "last_activity": data["last_activity"],
     })
+
+
+log_event("INFO", "server_start",
+          state_dir=_data_dir, log_dir=LOG_DIR,
+          inactivity_min=INACTIVITY_TIMEOUT.total_seconds() / 60)
 
 
 if __name__ == "__main__":
