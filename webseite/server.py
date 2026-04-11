@@ -44,9 +44,16 @@ def load_state():
         return _fresh()
     with open(STATE_FILE) as f:
         data = json.load(f)
-    # defensiv: fehlende Felder auffüllen (Upgrade vom alten Schema)
+    # Migration vom alten Schema {"state": N}: wenn nur das alte
+    # "state"-Feld vorliegt, wird der Spielstand komplett zurück-
+    # gesetzt. Das alte state=0 war "Spiel läuft, aber nichts
+    # gescannt" – im neuen Schema nicht 1:1 mappbar, daher lieber
+    # sauber neu starten, damit niemand in einem "zu früh zurück"-
+    # Zombie-Zustand hängen bleibt.
     if "station" not in data:
-        data["station"] = data.get("state", IDLE)
+        fresh = _fresh()
+        save_state(fresh)
+        return fresh
     data.setdefault("task_done", False)
     data.setdefault("last_activity", datetime.now().isoformat())
     return data
