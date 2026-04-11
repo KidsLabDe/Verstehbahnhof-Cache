@@ -111,14 +111,9 @@ void resetTrainToCurrent() {
 
 // Bewegt den Zug einen Schritt weiter und zeichnet das Bild.
 // Der Zug pendelt zwischen currentStation und currentStation+1.
+// Ohne API-Status (currentStation < 0) pendelt er zwischen Bahnhof 0 und 1.
 // Am Ziel (letzter Bahnhof) steht der Zug still.
 void tickTrainAnimation() {
-    if (currentStation < 0) {
-        drawBaseline();
-        strip.show();
-        return;
-    }
-
     // Am Ziel angekommen: keine Bewegung, alles grün, kein Zug gezeichnet
     if (currentStation >= (int)NUM_STATIONS - 1) {
         drawBaseline();
@@ -126,8 +121,9 @@ void tickTrainAnimation() {
         return;
     }
 
-    const int ledA = stationLed(currentStation);
-    const int ledB = stationLed(currentStation + 1);
+    const int cs = (currentStation < 0) ? 0 : currentStation;
+    const int ledA = stationLed(cs);
+    const int ledB = stationLed(cs + 1);
 
     trainPos += trainDir;
     if (trainPos >= ledB) {
