@@ -125,12 +125,24 @@ void tickTrainAnimation() {
     const int ledA = stationLed(cs);
     const int ledB = stationLed(cs + 1);
 
+    // Zug soll die Bahnhofs-LEDs nicht überfahren: eine LED davor umkehren.
+    const int minPos = ledA + 1;
+    const int maxPos = ledB - 1;
+
+    // Wenn die Bahnhöfe direkt nebeneinander liegen, gibt es keinen Platz
+    // für den Zug dazwischen – dann lieber gar nichts malen.
+    if (maxPos < minPos) {
+        drawBaseline();
+        strip.show();
+        return;
+    }
+
     trainPos += trainDir;
-    if (trainPos >= ledB) {
-        trainPos = ledB;
+    if (trainPos >= maxPos) {
+        trainPos = maxPos;
         trainDir = -1;
-    } else if (trainPos <= ledA) {
-        trainPos = ledA;
+    } else if (trainPos <= minPos) {
+        trainPos = minPos;
         trainDir = +1;
     }
 
