@@ -11,7 +11,8 @@
 // Liefert den aktuellen Zustand der Reise als JSON, z.B.:
 //   { "currentStation": 2, "totalStations": 5 }
 #define API_URL         "http://verstehbahnhof-cache.local/api/status"
-#define API_POLL_MS     2000    // wie oft pollen
+#define API_POLL_MS     5000    // wie oft pollen
+#define API_TIMEOUT_MS  1500    // HTTP-Timeout (kurz halten, sonst stockt Animation)
 
 // --- NeoPixel ---
 // D2 am Wemos D1 Mini (Lite) == GPIO4 (sicherer Pin, keine Boot-Konflikte)
@@ -22,6 +23,9 @@
 // Wie schnell der Zug zwischen zwei Bahnhöfen pendelt (ms pro LED-Schritt).
 // Kleinere Zahl = schneller. 18 ≈ 55 fps.
 #define TRAIN_FRAME_MS  18
+
+// Anzahl Waggons hinter der Lok (dunkler werdendes Blau)
+#define NUM_WAGONS      3
 
 // Die Bahnhöfe selbst (Namen + Reihenfolge) stehen in main.cpp in
 // STATION_NAMES[]. Die Positionen auf dem Streifen werden automatisch

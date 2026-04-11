@@ -27,6 +27,12 @@
 #ifndef TRAIN_FRAME_MS
 #define TRAIN_FRAME_MS 18
 #endif
+#ifndef NUM_WAGONS
+#define NUM_WAGONS 3
+#endif
+#ifndef API_TIMEOUT_MS
+#define API_TIMEOUT_MS 1500
+#endif
 
 Adafruit_NeoPixel strip(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -56,7 +62,21 @@ const uint32_t COLOR_OFF           = Adafruit_NeoPixel::Color(0, 0, 0);
 const uint32_t COLOR_TRACK_DONE    = Adafruit_NeoPixel::Color(6, 6, 6);     // dim weiß
 const uint32_t COLOR_STATION_DONE  = Adafruit_NeoPixel::Color(0, 150, 0);   // grün
 const uint32_t COLOR_STATION_TODO  = Adafruit_NeoPixel::Color(150, 0, 0);   // rot
-const uint32_t COLOR_TRAIN         = Adafruit_NeoPixel::Color(0, 40, 220);  // blau
+const uint32_t COLOR_TRAIN         = Adafruit_NeoPixel::Color(0, 40, 220);  // blau (Lok)
+
+// Waggons werden mit abnehmender Helligkeit hinter der Lok gezeichnet.
+// Die Basisfarbe ist ein dunkleres Blau als die Lok, pro Waggon wird weiter
+// gedimmt. Wird programmatisch in wagonColor() berechnet.
+uint32_t wagonColor(int idx /* 1..NUM_WAGONS */) {
+    // Faktor 0.55, 0.30, 0.15, ...
+    const float base_r = 0.0f, base_g = 20.0f, base_b = 140.0f;
+    float f = 1.0f;
+    for (int i = 0; i < idx; i++) f *= 0.55f;
+    return Adafruit_NeoPixel::Color(
+        (uint8_t)(base_r * f),
+        (uint8_t)(base_g * f),
+        (uint8_t)(base_b * f));
+}
 
 // -------- Zustand --------
 int currentStation = -1;  // letzter bekannter Bahnhof (−1 = noch nix)
@@ -81,8 +101,21 @@ void drawBaseline() {
     }
 }
 
-void drawWithTrain(int trainLed) {
+// Malt Lok + Waggons. Waggons liegen entgegen der Fahrtrichtung hinter
+// der Lok und werden nicht auf Bahnhofs-LEDs gezeichnet (sie "verschwinden"
+// dort im Bahnhof). ledA/ledB sind die LED-Positionen der beiden Bahnhöfe,
+// zwischen denen der Zug gerade pendelt.
+void drawTrainWithWagons(int trainLed, int dir, int ledA, int ledB) {
     drawBaseline();
+
+    // Waggons zuerst, Lok darüber (falls Überlappung)
+    for (int w = NUM_WAGONS; w >= 1; w--) {
+        int wp = trainLed - w * dir;
+        if (wp > ledA && wp < ledB) {
+            strip.setPixelColor(wp, wagonColor(w));
+        }
+    }
+
     if (trainLed >= 0 && trainLed < (int)NEOPIXEL_COUNT) {
         strip.setPixelColor(trainLed, COLOR_TRAIN);
     }
@@ -146,7 +179,7 @@ void tickTrainAnimation() {
         trainDir = +1;
     }
 
-    drawWithTrain(trainPos);
+    drawTrainWithWagons(trainPos, trainDir, ledA, ledB);
 }
 
 // -------- Netzwerk --------
@@ -178,7 +211,7 @@ int fetchCurrentStation() {
     WiFiClient client;
     HTTPClient http;
     http.begin(client, API_URL);
-    http.setTimeout(3000);
+    http.setTimeout(API_TIMEOUT_MS);
 
     int code = http.GET();
     if (code != 200) {
