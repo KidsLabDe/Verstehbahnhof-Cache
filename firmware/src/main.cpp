@@ -548,6 +548,22 @@ void loop() {
             lastAttractFrame = now;
             tickAttractAnimation();
         }
+    } else if (currentStation >= (int)NUM_STATIONS - 1) {
+        // --- Am Finale: Zug steht still, aber wir müssen trotzdem
+        //     regelmäßig pollen, damit wir den Inactivity-Reset
+        //     (Server → station=-1) mitbekommen. Sonst bliebe der
+        //     ESP auf ewig am Finale hängen.
+        static unsigned long lastFinalePoll = 0;
+        if (now - lastFinalePoll >= ATTRACT_POLL_MS) {
+            lastFinalePoll = now;
+            pollApiAndUpdate();
+        }
+
+        static unsigned long lastFinaleFrame = 0;
+        if (now - lastFinaleFrame >= TRAIN_FRAME_MS) {
+            lastFinaleFrame = now;
+            tickTrainAnimation();   // zeichnet die statische Finale-Baseline
+        }
     } else {
         // --- Normale Pendel-Animation ---
         // API-Poll passiert am Wendepunkt in tickTrainAnimation.
