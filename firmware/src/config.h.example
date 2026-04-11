@@ -1,0 +1,25 @@
+#pragma once
+
+// Kopiere diese Datei nach config.h und trage echte Werte ein.
+// config.h ist in .gitignore und wird nicht eingecheckt.
+
+// --- WLAN ---
+#define WIFI_SSID       "DEIN_WLAN"
+#define WIFI_PASSWORD   "DEIN_PASSWORT"
+
+// --- API (MatzE) ---
+// Liefert den aktuellen Zustand der Reise als JSON, z.B.:
+//   { "currentStation": 2, "totalStations": 5 }
+#define API_URL         "http://verstehbahnhof-cache.local/api/status"
+#define API_POLL_MS     2000    // wie oft pollen
+
+// --- NeoPixel ---
+// D2 am Wemos D1 Mini == GPIO4 (sicherer Pin, keine Boot-Konflikte)
+#define NEOPIXEL_PIN    D2
+#define NEOPIXEL_COUNT  30      // LEDs auf dem Streifen insgesamt
+#define NEOPIXEL_BRIGHTNESS 80  // 0..255
+
+// Bahnhöfe als LED-Index auf dem Streifen
+// (Fürstenberg = Start, Augsburg = Ziel)
+// Anzahl muss zu totalStations aus der API passen.
+static const uint16_t STATION_LEDS[] = { 0, 7, 14, 22, 29 };
