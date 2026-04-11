@@ -9,6 +9,10 @@ services:
     environment:
       - STATE_DIR=/app/state
       - LOG_DIR=/app/log
+      # Timeouts in Minuten. Zum Ändern einfach die Werte hier anpassen
+      # und "docker compose up -d" neu aufrufen.
+      - INACTIVITY_TIMEOUT_MIN=15   # während des Spiels
+      - ARRIVED_TIMEOUT_MIN=5       # nach dem Finale (nächste Gruppe)
     networks:
       - proxy
     labels:

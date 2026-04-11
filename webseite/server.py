@@ -9,7 +9,20 @@ app = Flask(__name__)
 _data_dir = os.environ.get("STATE_DIR", os.path.dirname(__file__))
 os.makedirs(_data_dir, exist_ok=True)
 STATE_FILE = os.path.join(_data_dir, "state.json")
-INACTIVITY_TIMEOUT = timedelta(minutes=15)
+
+# Inactivity-Timeouts (in Minuten, via Env konfigurierbar):
+#  - INACTIVITY_TIMEOUT_MIN: während des Spiels, bevor der Server auf
+#    Idle zurückfällt. Standard 15 min.
+#  - ARRIVED_TIMEOUT_MIN: nach dem Gewinn (station == 4, Finale-Screen).
+#    Meist kürzer, damit die nächste Gruppe schneller dran ist.
+def _int_env(name, default):
+    try:
+        return int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return default
+
+INACTIVITY_TIMEOUT = timedelta(minutes=_int_env("INACTIVITY_TIMEOUT_MIN", 15))
+ARRIVED_TIMEOUT    = timedelta(minutes=_int_env("ARRIVED_TIMEOUT_MIN", 15))
 
 # -------- Logging --------
 #
@@ -99,10 +112,16 @@ def save_state(data):
 def get_state():
     data = load_state()
     last = datetime.fromisoformat(data["last_activity"])
-    if datetime.now() - last > INACTIVITY_TIMEOUT:
+    # Am Finale gilt ein ggf. kürzerer Timeout, damit die nächste Gruppe
+    # nicht ewig auf den Reset warten muss.
+    at_finale = data.get("station") == NUM_STATIONS - 1
+    timeout = ARRIVED_TIMEOUT if at_finale else INACTIVITY_TIMEOUT
+    if datetime.now() - last > timeout:
         log_event("INFO", "inactivity_reset",
                   prev_station=data.get("station"),
-                  prev_task_done=data.get("task_done"))
+                  prev_task_done=data.get("task_done"),
+                  at_finale=at_finale,
+                  timeout_min=int(timeout.total_seconds() / 60))
         data = _fresh()
         save_state(data)
     return data
@@ -287,7 +306,8 @@ def state():
 
 log_event("INFO", "server_start",
           state_dir=_data_dir, log_dir=LOG_DIR,
-          inactivity_min=INACTIVITY_TIMEOUT.total_seconds() / 60)
+          inactivity_min=int(INACTIVITY_TIMEOUT.total_seconds() / 60),
+          arrived_min=int(ARRIVED_TIMEOUT.total_seconds() / 60))
 
 
 if __name__ == "__main__":
