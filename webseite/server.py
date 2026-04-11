@@ -81,6 +81,8 @@ def _fresh():
         "station": IDLE,
         "task_done": False,
         "last_activity": datetime.now().isoformat(),
+        "started_at": None,   # wird gesetzt wenn IDLE → Fürstenberg
+        "finished_at": None,  # wird gesetzt beim Finale-Übergang
     }
 
 
@@ -101,7 +103,33 @@ def load_state():
         return fresh
     data.setdefault("task_done", False)
     data.setdefault("last_activity", datetime.now().isoformat())
+    data.setdefault("started_at", None)
+    data.setdefault("finished_at", None)
     return data
+
+
+def _duration_sec(data):
+    """Spieldauer in Sekunden aus started_at/finished_at, oder None."""
+    s = data.get("started_at")
+    f = data.get("finished_at")
+    if not s or not f:
+        return None
+    try:
+        return int((datetime.fromisoformat(f) -
+                    datetime.fromisoformat(s)).total_seconds())
+    except (ValueError, TypeError):
+        return None
+
+
+def _format_duration(sec):
+    """Formatiert Sekunden als menschenlesbare Dauer."""
+    if sec is None or sec < 0:
+        return "—"
+    mins, secs = divmod(int(sec), 60)
+    if mins >= 60:
+        h, m = divmod(mins, 60)
+        return f"{h}h {m}m {secs}s"
+    return f"{mins}m {secs:02d}s"
 
 
 def save_state(data):
@@ -166,24 +194,37 @@ def scan_start_qr_impl():
     Returns (data, kind) mit kind ∈ {started, advanced, arrived, pending}.
     """
     data = get_state()
+    now_iso = datetime.now().isoformat()
 
     if data["station"] == IDLE:
         data = {
             "station": STATION_FURSTENBERG,
             "task_done": False,
-            "last_activity": datetime.now().isoformat(),
+            "last_activity": now_iso,
+            "started_at": now_iso,    # Stoppuhr läuft an
+            "finished_at": None,
         }
         save_state(data)
         return data, "started"
 
     if data["task_done"] and data["station"] < NUM_STATIONS - 1:
-        data = {
-            "station": data["station"] + 1,
+        new_station = data["station"] + 1
+        new_data = {
+            "station": new_station,
             "task_done": False,
-            "last_activity": datetime.now().isoformat(),
+            "last_activity": now_iso,
+            "started_at": data.get("started_at"),   # Stoppuhr läuft weiter
+            "finished_at": data.get("finished_at"),
         }
-        save_state(data)
-        return data, "advanced"
+        # Finale-Übergang: Stoppuhr stoppt
+        if new_station == NUM_STATIONS - 1:
+            new_data["finished_at"] = now_iso
+            log_event("INFO", "game_finished",
+                      started_at=new_data["started_at"],
+                      finished_at=new_data["finished_at"],
+                      duration_sec=_duration_sec(new_data))
+        save_state(new_data)
+        return new_data, "advanced"
 
     if data["station"] == NUM_STATIONS - 1:
         data = touch(data)
@@ -268,6 +309,34 @@ def reset_confirm():
     return render_template("reset_done.html")
 
 
+def read_logbook_entries():
+    """Liest alle Logbuch-Einträge aus der JSONL-Datei. Newest first."""
+    entries = []
+    if os.path.exists(LOGBOOK_FILE):
+        try:
+            with open(LOGBOOK_FILE, encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        entries.append(json.loads(line))
+                    except json.JSONDecodeError:
+                        pass
+        except Exception as exc:
+            log_event("ERROR", "logbook_read_failed", error=str(exc))
+    entries.reverse()
+    return entries
+
+
+@app.route("/logbook", methods=["GET"])
+def logbook_view():
+    return render_template("logbook_view.html",
+                           entries=read_logbook_entries(),
+                           just_submitted_ts=None,
+                           format_duration=_format_duration)
+
+
 @app.route("/logbook", methods=["POST"])
 def logbook_submit():
     name = (request.form.get("name") or "").strip()[:100]
@@ -277,10 +346,15 @@ def logbook_submit():
                   reason="empty", has_name=bool(name), has_comment=bool(comment))
         return redirect("/aufgabe_st4rt_v9p")
 
+    data_now = get_state()
+    duration_sec = _duration_sec(data_now)
     entry = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "name": name,
         "comment": comment,
+        "duration_sec": duration_sec,
+        "started_at": data_now.get("started_at"),
+        "finished_at": data_now.get("finished_at"),
     }
     try:
         with open(LOGBOOK_FILE, "a", encoding="utf-8") as f:
@@ -289,8 +363,14 @@ def logbook_submit():
         log_event("ERROR", "logbook_write_failed", error=str(exc))
 
     log_event("INFO", "logbook_entry",
-              name=name, comment_len=len(comment))
-    return render_template("logbook_thanks.html", name=name, comment=comment)
+              name=name, comment_len=len(comment), duration_sec=duration_sec)
+
+    # Nach dem Eintragen direkt in die Liste, der frische Eintrag wird
+    # oben hervorgehoben (just_submitted_ts matcht auf entry.timestamp).
+    return render_template("logbook_view.html",
+                           entries=read_logbook_entries(),
+                           just_submitted_ts=entry["timestamp"],
+                           format_duration=_format_duration)
 
 
 @app.route("/state")

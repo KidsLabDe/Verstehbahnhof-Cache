@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}
+{%- if just_submitted_ts -%}Danke für deinen Eintrag
+{%- else -%}Logbuch
+{%- endif -%}
+{% endblock %}
+{% block header_title %}Logbuch{% endblock %}
+
+{% block extra_style %}
+.thanks-banner {
+  background: linear-gradient(90deg, var(--accent2) 0%, var(--accent) 50%, var(--accent2) 100%);
+  color: var(--bg);
+  padding: 0.9rem 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 2px solid var(--accent);
+}
+
+.lb-entry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.lb-entry.mine {
+  border-color: var(--accent);
+  border-width: 2px;
+  box-shadow: 0 0 0 1px var(--accent2) inset;
+}
+
+.lb-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+.lb-name {
+  color: var(--accent);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.lb-ts {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.lb-badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+.lb-badge.duration {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.lb-badge.mine {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+  font-weight: bold;
+}
+
+.lb-comment {
+  border-left: 3px solid var(--accent);
+  padding: 0.5rem 0 0.5rem 0.9rem;
+  color: var(--text);
+  font-style: italic;
+  white-space: pre-wrap;
+  margin-top: 0.5rem;
+}
+
+.lb-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.btn-row { display: flex; gap: 0.6rem; margin-top: 1rem; flex-wrap: wrap; }
+.btn {
+  display: inline-block;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+{% endblock %}
+
+{% block content %}
+
+{% if just_submitted_ts %}
+<div class="thanks-banner">
+  &#x2605; &nbsp; Danke für deinen Eintrag! &nbsp; &#x2605;
+</div>
+<div class="card">
+  <p>
+    Dein Gruß ist jetzt Teil von Emmas Reisebuch. Unten siehst du
+    deinen Eintrag und alle bisherigen Logbuch-Einträge.
+  </p>
+  <div class="btn-row">
+    <a class="btn" href="/aufgabe_st4rt_v9p">Zurück zum Finale</a>
+    <a class="btn" href="/reset">Spielstand zurücksetzen</a>
+  </div>
+</div>
+{% endif %}
+
+{% if entries %}
+<div class="card-label" style="margin-bottom:0.5rem;">
+  {{ entries|length }} Eintrag{% if entries|length != 1 %}e{% endif %} im Logbuch
+</div>
+
+{% for entry in entries %}
+{% set is_mine = just_submitted_ts and entry.timestamp == just_submitted_ts %}
+<div class="lb-entry {% if is_mine %}mine{% endif %}">
+  <div class="lb-head">
+    <span class="lb-name">{{ entry.name }}</span>
+    <span class="lb-ts">{{ entry.timestamp }}</span>
+    {% if is_mine %}
+    <span class="lb-badge mine">Dein Eintrag</span>
+    {% endif %}
+    {% if entry.duration_sec is not none %}
+    <span class="lb-badge duration">
+      &#x23F1; {{ format_duration(entry.duration_sec) }}
+    </span>
+    {% endif %}
+  </div>
+  <div class="lb-comment">{{ entry.comment }}</div>
+</div>
+{% endfor %}
+
+{% else %}
+<div class="card">
+  <div class="lb-empty">
+    Noch keine Einträge.<br>
+    Spiel den Cache durch und trag dich am Finale ein!
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
