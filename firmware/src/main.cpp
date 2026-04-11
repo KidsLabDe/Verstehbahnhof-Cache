@@ -25,7 +25,7 @@
 #include "config.h"
 
 #ifndef TRAIN_FRAME_MS
-#define TRAIN_FRAME_MS 90
+#define TRAIN_FRAME_MS 18
 #endif
 
 Adafruit_NeoPixel strip(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);

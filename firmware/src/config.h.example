@@ -20,8 +20,8 @@
 #define NEOPIXEL_BRIGHTNESS 80  // 0..255
 
 // Wie schnell der Zug zwischen zwei Bahnhöfen pendelt (ms pro LED-Schritt).
-// Kleinere Zahl = schneller.
-#define TRAIN_FRAME_MS  90
+// Kleinere Zahl = schneller. 18 ≈ 55 fps.
+#define TRAIN_FRAME_MS  18
 
 // Die Bahnhöfe selbst (Namen + Reihenfolge) stehen in main.cpp in
 // STATION_NAMES[]. Die Positionen auf dem Streifen werden automatisch
