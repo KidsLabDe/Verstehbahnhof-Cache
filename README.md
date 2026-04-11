@@ -175,15 +175,18 @@ pio device monitor                       # optional: live-log
 
 ## Inspektion auf dem Host
 
-```bash
-# Spielstand ansehen
-docker compose exec webseite cat /app/state/state.json
+Die Logs liegen per Bind-Mount direkt neben `compose.yml` im Ordner
+`logs/` — da kann man sie ohne `docker compose exec` lesen und backuppen:
 
+```bash
 # Tageslog live mitlesen
-docker compose exec webseite tail -f /app/log/$(date +%F).log
+tail -f logs/$(date +%F).log
 
 # Alle Logbuch-Einträge
-docker compose exec webseite cat /app/log/logbook.jsonl | jq .
+cat logs/logbook.jsonl | jq .
+
+# Spielstand ansehen (steckt in einem Named Volume, daher via exec)
+docker compose exec webseite cat /app/state/state.json
 
 # State komplett zurücksetzen (vor Event, Testlauf, etc.)
 docker compose exec webseite rm -f /app/state/state.json
