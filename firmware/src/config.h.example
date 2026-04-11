@@ -32,6 +32,15 @@
 // Anzahl Waggons hinter der Lok (dunkler werdendes Blau)
 #define NUM_WAGONS      3
 
+// --- Attract-Animation (Feuer + Feuerwerk, wenn noch niemand den
+//     Initial-QR gescannt hat, d.h. state < 0) ---
+#define ATTRACT_POLL_MS    3000   // wie oft während Attract die API fragen
+#define FIRE_COOLING       55     // Fire2012 Abkühlrate (höher = dunkler)
+#define FIRE_SPARKING      120    // Zündwahrscheinlichkeit 0..255
+#define MAX_BURSTS         6      // gleichzeitige Feuerwerks-Bursts
+#define BURST_FADE         12     // Helligkeitsabfall pro Frame 0..255
+#define BURST_SPAWN_CHANCE 8      // Promille pro Frame neuer Burst
+
 // Die Bahnhöfe selbst (Namen + Reihenfolge) stehen in main.cpp in
 // STATION_NAMES[]. Die Positionen auf dem Streifen werden automatisch
 // gleichmäßig verteilt – du musst hier nur NEOPIXEL_COUNT korrekt setzen.

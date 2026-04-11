@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}
+{%- if kind == "started" -%}Start – Emmas Reise beginnt
+{%- elif kind == "advanced" -%}Emma rollt weiter
+{%- elif kind == "arrived" -%}Finale – Augsburg!
+{%- else -%}Noch nicht so weit
+{%- endif -%}
+{% endblock %}
+
+{% block header_title %}
+{%- if kind == "started" -%}Station 0 / 4
+{%- elif kind == "arrived" -%}Station 4 / 4 – Finale!
+{%- else -%}Station {{ station }} / 4
+{%- endif -%}
+{% endblock %}
+
+{% block extra_style %}
+{% if kind == "arrived" %}
+@keyframes pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 8px var(--accent); }
+  50%      { opacity: 0.7; text-shadow: 0 0 20px var(--accent); }
+}
+.finale-title {
+  animation: pulse 2s infinite;
+  color: var(--accent);
+  font-size: 1.4rem;
+  text-align: center;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.5rem 0 1rem;
+}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{# --- Fall 1: Spiel wird gerade gestartet --- #}
+{% if kind == "started" %}
+<div class="card">
+  <div class="card-label">Notruf aus Fürstenberg</div>
+  <h2>Emma steckt fest!</h2>
+  <p>
+    Willkommen, Entdecker:in! Jim Knopf, Lukas der Lokomotivführer und die
+    kleine Lok Emma sind eigentlich auf dem Heimweg nach Augsburg zur
+    Puppenkiste – doch sie sind im Verstehbahnhof Fürstenberg gestrandet.
+  </p>
+  <p>
+    <em>„Das Schloss an Emmas Feuerbüchse ist zu"</em>, seufzt Jim.
+    <em>„Ohne Schlüssel kein Feuer, ohne Feuer kein Dampf,
+    ohne Dampf kein Augsburg …"</em>
+  </p>
+  <p>
+    Auf der Strecke vor dir flackert das Lagerfeuer – Emma wartet, dass
+    jemand das Schloss findet und die Reise beginnt.
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">Erste Aufgabe</div>
+  <h2>Such das Lok-Bild</h2>
+  <p>
+    Irgendwo im Verstehbahnhof hängt ein großes Bild von Emma. Dort ist
+    der nächste QR-Code versteckt – scanne ihn, um Jim beim Schloss zu
+    helfen. Komm danach zurück zu Emma!
+  </p>
+  <div class="hint-box">
+    <div class="hint-label">Deine Aufgabe</div>
+    Finde das Lok-Bild im Verstehbahnhof.<br>
+    Dort wartet der nächste QR-Code.
+  </div>
+</div>
+
+{# --- Fall 2: Task erledigt, Bahnhof wird freigeschaltet --- #}
+{% elif kind == "advanced" %}
+<div class="card">
+  <div class="card-label">Bahnhof freigeschaltet</div>
+  <h2>Emma rollt weiter!</h2>
+  <p>
+    Du hast Jim geholfen – schau zu Emma auf die Strecke: Der neue Bahnhof
+    wird gerade <em>geöffnet</em>. Er blinkt, fadet aus und wird grün.
+    Dann setzt sich Emma wieder in Bewegung.
+  </p>
+  {% if station == 1 %}
+  <p>
+    Nächster Halt: <strong>Berlin</strong>. Dort gibt es ein Repair Café,
+    in dem Jim das Schloss wieder gangbar kriegen kann.
+  </p>
+  {% elif station == 2 %}
+  <p>
+    Nächster Halt: <strong>Leipzig</strong>. Jim hat seinen Goldstein
+    verloren – er muss ihn dringend wiederfinden.
+  </p>
+  {% elif station == 3 %}
+  <p>
+    Nächster Halt: <strong>Nürnberg</strong>. Emma braucht einen Anschub –
+    Zeit, eine Lore zu finden.
+  </p>
+  {% endif %}
+</div>
+
+<div class="card">
+  <div class="card-label">Nächste Aufgabe</div>
+  <h2>Such den nächsten QR-Code</h2>
+  <div class="hint-box">
+    <div class="hint-label">Deine Aufgabe</div>
+    {% if station == 1 %}
+      Finde das Repair-Café-Plakat im Verstehbahnhof.
+    {% elif station == 2 %}
+      Suche den Goldstein auf dem Gelände.
+    {% elif station == 3 %}
+      Finde die Lore auf dem Gelände.
+    {% endif %}
+    <br>
+    Scanne dort den QR-Code und komm wieder hierher zurück.
+  </div>
+</div>
+
+{# --- Fall 3: Task noch offen, zu früh zurück --- #}
+{% elif kind == "pending" %}
+<div class="card">
+  <div class="card-label">Hmmm …</div>
+  <h2>Du bist zu früh zurück!</h2>
+  <p>
+    Emma wartet noch. Du musst erst die aktuelle Aufgabe lösen, bevor der
+    nächste Bahnhof geöffnet werden kann.
+  </p>
+  {% if station == 0 %}
+  <p>Suche das <strong>Lok-Bild</strong> im Verstehbahnhof.</p>
+  {% elif station == 1 %}
+  <p>Suche das <strong>Repair-Café-Plakat</strong>.</p>
+  {% elif station == 2 %}
+  <p>Suche den <strong>Goldstein</strong>.</p>
+  {% elif station == 3 %}
+  <p>Suche die <strong>Lore</strong>.</p>
+  {% endif %}
+  <div class="hint-box">
+    <div class="hint-label">Hinweis</div>
+    Scanne erst den QR-Code an der aktuellen Aufgabe.<br>
+    Danach kommst du hier wieder vorbei.
+  </div>
+</div>
+
+{# --- Fall 4: Ziel erreicht --- #}
+{% else %}
+<div class="card" style="text-align:center;">
+  <div class="finale-title">&#x1F682; Glückwunsch! &#x1F682;</div>
+  <div class="card-label">Jim Knopf sagt</div>
+  <p style="margin-top:0.75rem;">
+    <em>
+      „Ich hab's! Schloss, Repair Café, Goldstein, Lore – alles da!
+      Emma und ich können endlich nach Augsburg zurückfahren.
+      Du hast mir das Leben gerettet!"
+    </em>
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">Du hast es geschafft</div>
+  <h2>Die finale Box</h2>
+  <p>
+    Hier bei Emma ist die finale Cache-Box versteckt.
+    Trag dich ins Logbuch ein und hinterlasse Jim Knopf eine Botschaft
+    für seine Weiterreise.
+  </p>
+  <p>
+    Vergiss nicht, den Fund auch online auf geocaching.com einzutragen!
+  </p>
+  <div class="hint-box">
+    <div class="hint-label">TFTC</div>
+    Thanks for this cache &nbsp;&#x2014;&nbsp;
+    Danke fürs Mitspielen!
+  </div>
+</div>
+
+<div class="card" style="text-align:center;">
+  <p style="font-size:0.82rem;color:var(--muted);">
+    Cache gelegt vom Verstehbahnhof Fürstenberg (Halle).<br>
+    Lock &#x2192; Repair Café &#x2192; Goldstein &#x2192; Lore &#x2192; Augsburg
+  </p>
+</div>
+
+{% endif %}
+
+{% endblock %}

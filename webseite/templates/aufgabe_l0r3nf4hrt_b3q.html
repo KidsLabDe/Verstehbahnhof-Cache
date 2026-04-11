@@ -1,26 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Finale – Geschafft!{% endblock %}
+{% block title %}Station 4 – Die Lore{% endblock %}
 {% block header_title %}Station 4 / 4{% endblock %}
 
-{% block extra_style %}
-@keyframes pulse {
-  0%, 100% { text-shadow: 0 0 8px var(--accent); }
-  50% { text-shadow: 0 0 22px var(--accent); opacity: 0.75; }
-}
-.finale { animation: pulse 2s infinite; color: var(--accent); font-size: 1.3rem;
-          text-align: center; letter-spacing: 0.15em; padding: 0.75rem 0 1.25rem; }
-{% endblock %}
-
 {% block content %}
-<div class="card" style="text-align:center;">
-  <div class="finale">&#x1F682; Geschafft! &#x1F682;</div>
-  <p>Jim Knopf kann nach Augsburg zurückfahren. Danke für deine Hilfe!</p>
+<div class="card">
+  <p>Du hast die Lore gefunden! Jetzt kann Emma zurück nach Augsburg rollen.</p>
 </div>
 
 <div class="card">
-  <div class="card-label">Finale Cache-Box</div>
-  <h2>Hier ist die Box versteckt</h2>
-  <p>Trag dich ins Logbuch ein und vergiss nicht, den Fund online einzutragen.</p>
+  <div class="card-label">Letzter Schritt</div>
+  <h2>Geh zurück zum Start-QR</h2>
+  <p>
+    Scanne den Start-QR ein letztes Mal –<br>
+    dann fährt Emma nach Augsburg!
+  </p>
 </div>
 {% endblock %}

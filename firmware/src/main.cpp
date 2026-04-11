@@ -33,6 +33,24 @@
 #ifndef API_TIMEOUT_MS
 #define API_TIMEOUT_MS 1500
 #endif
+#ifndef ATTRACT_POLL_MS
+#define ATTRACT_POLL_MS 3000
+#endif
+#ifndef FIRE_COOLING
+#define FIRE_COOLING 55
+#endif
+#ifndef FIRE_SPARKING
+#define FIRE_SPARKING 120
+#endif
+#ifndef MAX_BURSTS
+#define MAX_BURSTS 6
+#endif
+#ifndef BURST_FADE
+#define BURST_FADE 12
+#endif
+#ifndef BURST_SPAWN_CHANCE
+#define BURST_SPAWN_CHANCE 8
+#endif
 
 Adafruit_NeoPixel strip(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
@@ -139,6 +157,48 @@ void arrivalAnimation() {
     }
 }
 
+// Spielt die "Bahnhof wird geöffnet"-Animation auf der LED-Position des
+// übergebenen Bahnhofs. Phasen: 3x rot blinken → langsam rot ausfaden →
+// langsam grün einfaden. Restlicher Streifen wird in seiner Baseline
+// gehalten. Blockierend, ~1.8 s. Wird aufgerufen, BEVOR currentStation
+// auf den neuen Wert gesetzt wird, damit drawBaseline() den Bahnhof
+// noch als rot kennt und die Farben sauber übereinander laufen.
+void openStationAnimation(int newStationIdx) {
+    if (newStationIdx < 0 || newStationIdx >= (int)NUM_STATIONS) return;
+    const int led = stationLed(newStationIdx);
+
+    // Phase 1: kräftiges rotes Blinken
+    for (int i = 0; i < 3; i++) {
+        drawBaseline();
+        strip.setPixelColor(led, Adafruit_NeoPixel::Color(255, 0, 0));
+        strip.show();
+        delay(180);
+        drawBaseline();
+        strip.setPixelColor(led, 0);
+        strip.show();
+        delay(120);
+    }
+    // Phase 2: rot → schwarz faden
+    for (int v = 255; v >= 0; v -= 25) {
+        drawBaseline();
+        strip.setPixelColor(led, Adafruit_NeoPixel::Color(v, 0, 0));
+        strip.show();
+        delay(25);
+    }
+    // Phase 3: schwarz → grün faden
+    for (int v = 0; v <= 150; v += 15) {
+        drawBaseline();
+        strip.setPixelColor(led, Adafruit_NeoPixel::Color(0, v, 0));
+        strip.show();
+        delay(25);
+    }
+    // kurz grün halten, damit der "Klick" sichtbar ist
+    drawBaseline();
+    strip.setPixelColor(led, Adafruit_NeoPixel::Color(0, 150, 0));
+    strip.show();
+    delay(300);
+}
+
 // Setzt die Zug-Position passend zum aktuellen Bahnhof zurück.
 void resetTrainToCurrent() {
     trainPos = stationLed(currentStation);
@@ -194,6 +254,159 @@ void tickTrainAnimation() {
     }
 }
 
+// -------- Attract-Animation (Feuer + Feuerwerk) --------
+//
+// Aktiv wenn noch niemand den Initial-QR gescannt hat (currentStation < 0).
+// Fire2012 als Basis, darüber gelayerte Bursts als Feuerwerk.
+
+static uint8_t heat[NEOPIXEL_COUNT];
+
+struct Burst {
+    int16_t led;   // LED-Position; -1 = Slot frei
+    uint8_t life;  // 0..255, fadet ab
+    uint8_t r, g, b;
+};
+static Burst bursts[MAX_BURSTS];
+
+static inline uint8_t qadd8(uint8_t a, uint8_t b) {
+    uint16_t s = (uint16_t)a + b;
+    return s > 255 ? 255 : (uint8_t)s;
+}
+static inline uint8_t qsub8(uint8_t a, uint8_t b) {
+    return a > b ? a - b : 0;
+}
+
+// Fire2012-Palette: schwarz → rot → gelb → weiß
+uint32_t heatColor(uint8_t t) {
+    uint8_t t192 = (uint16_t)t * 191 / 255;  // 0..191
+    uint8_t heatramp = t192 & 0x3F;          // 0..63
+    heatramp <<= 2;                          // 0..252
+
+    if (t192 & 0x80) {
+        // obersten Drittel: gelb → weiß (r=255, g=255, b=ramp)
+        return Adafruit_NeoPixel::Color(255, 255, heatramp);
+    } else if (t192 & 0x40) {
+        // mittleres Drittel: rot → gelb (r=255, g=ramp, b=0)
+        return Adafruit_NeoPixel::Color(255, heatramp, 0);
+    } else {
+        // unteres Drittel: schwarz → rot (r=ramp, g=0, b=0)
+        return Adafruit_NeoPixel::Color(heatramp, 0, 0);
+    }
+}
+
+void fireStep() {
+    // 1. Abkühlen
+    for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) {
+        uint8_t cooldown = random(0, ((FIRE_COOLING * 10) / NEOPIXEL_COUNT) + 2);
+        heat[i] = qsub8(heat[i], cooldown);
+    }
+    // 2. Hitze nach oben driften
+    for (int i = NEOPIXEL_COUNT - 1; i >= 2; i--) {
+        heat[i] = ((uint16_t)heat[i - 1] + heat[i - 2] + heat[i - 2]) / 3;
+    }
+    // 3. Zufällig neu zünden (unten)
+    if ((uint8_t)random(0, 256) < FIRE_SPARKING) {
+        int y = random(0, 7);
+        heat[y] = qadd8(heat[y], random(160, 256));
+    }
+}
+
+void spawnBurst() {
+    // mittlere 60 % des Streifens
+    int lo = NEOPIXEL_COUNT / 5;
+    int hi = NEOPIXEL_COUNT - lo - 1;
+    if (hi < lo) { lo = 0; hi = NEOPIXEL_COUNT - 1; }
+
+    for (int i = 0; i < MAX_BURSTS; i++) {
+        if (bursts[i].led < 0) {
+            bursts[i].led = random(lo, hi + 1);
+            bursts[i].life = 255;
+            // Farbpalette: weiß, gelb, gold, cyan
+            uint8_t c = random(0, 4);
+            switch (c) {
+                case 0: bursts[i].r = 255; bursts[i].g = 255; bursts[i].b = 255; break;
+                case 1: bursts[i].r = 255; bursts[i].g = 220; bursts[i].b =  60; break;
+                case 2: bursts[i].r = 255; bursts[i].g = 160; bursts[i].b =   0; break;
+                case 3: bursts[i].r =  60; bursts[i].g = 220; bursts[i].b = 255; break;
+            }
+            return;
+        }
+    }
+}
+
+void burstStep() {
+    for (int i = 0; i < MAX_BURSTS; i++) {
+        if (bursts[i].led < 0) continue;
+        if (bursts[i].life <= BURST_FADE) {
+            bursts[i].led = -1;
+            bursts[i].life = 0;
+        } else {
+            bursts[i].life -= BURST_FADE;
+        }
+    }
+    // zufällig neuen Burst spawnen
+    if ((uint16_t)random(0, 1000) < BURST_SPAWN_CHANCE) {
+        spawnBurst();
+    }
+}
+
+void drawAttract() {
+    // Feuer als Basis
+    for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) {
+        strip.setPixelColor(i, heatColor(heat[i]));
+    }
+    // Bursts additiv drüberlegen (max pro Kanal)
+    for (int i = 0; i < MAX_BURSTS; i++) {
+        if (bursts[i].led < 0) continue;
+        uint16_t led = bursts[i].led;
+        if (led >= NEOPIXEL_COUNT) continue;
+
+        uint8_t bR = ((uint16_t)bursts[i].r * bursts[i].life) / 255;
+        uint8_t bG = ((uint16_t)bursts[i].g * bursts[i].life) / 255;
+        uint8_t bB = ((uint16_t)bursts[i].b * bursts[i].life) / 255;
+
+        uint32_t existing = strip.getPixelColor(led);
+        uint8_t eR = (existing >> 16) & 0xFF;
+        uint8_t eG = (existing >>  8) & 0xFF;
+        uint8_t eB = (existing      ) & 0xFF;
+
+        strip.setPixelColor(led,
+            bR > eR ? bR : eR,
+            bG > eG ? bG : eG,
+            bB > eB ? bB : eB);
+    }
+    strip.show();
+}
+
+void tickAttractAnimation() {
+    fireStep();
+    burstStep();
+    drawAttract();
+}
+
+// Wird einmalig gerufen, wenn state von -1 auf >= 0 wechselt (Initial-QR
+// wurde gescannt). Kurzer heller Flash über den ganzen Streifen.
+void transitionFlash() {
+    Serial.println("TRANSITION: Initial-QR erkannt – Flash!");
+    // 6 Frames à ~50 ms, von hell nach dunkel
+    const uint8_t steps[6] = { 255, 220, 180, 130, 80, 30 };
+    for (int s = 0; s < 6; s++) {
+        uint8_t v = steps[s];
+        for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) {
+            // weiß → gelb → rot über den Verlauf
+            uint8_t r = v;
+            uint8_t g = (uint16_t)v * (s < 2 ? 255 : (s < 4 ? 180 : 40)) / 255;
+            uint8_t b = (uint16_t)v * (s < 2 ? 255 : (s < 4 ?  40 :  0)) / 255;
+            strip.setPixelColor(i, r, g, b);
+        }
+        strip.show();
+        delay(50);
+    }
+    // Heat-Puffer zurücksetzen, damit nach dem Flash nicht sofort wieder
+    // ein Feuer-Artefakt sichtbar ist (falls wir je zurückfallen)
+    for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) heat[i] = 0;
+}
+
 // -------- Netzwerk --------
 
 void connectWifi() {
@@ -245,29 +458,47 @@ int fetchCurrentStation() {
         return -1;
     }
 
-    // MatzEs API liefert das Feld "state" (0..totalStations-1)
-    return doc["state"] | -1;
+    // MatzEs API liefert das Feld "station" (−1 = idle, 0..NUM_STATIONS−1)
+    return doc["station"] | -1;
 }
 
-// Holt den Status von der API und übernimmt ihn, falls sich etwas geändert
-// hat. Wird genau dann aufgerufen, wenn der Zug am "nächsten" (roten)
-// Bahnhof angekommen ist – nicht zeitgesteuert.
+// Holt den Status von MatzEs API und übernimmt ihn, falls sich etwas
+// geändert hat. Wird im Attract-Modus zeitgesteuert (alle
+// ATTRACT_POLL_MS) und im Pendel-Modus am Wendepunkt aufgerufen.
+//
+// Behandelt drei Übergänge besonders:
+//   prev < 0, s < 0  → kein Wechsel, nix tun
+//   prev < 0, s >= 0 → Spielstart (Transition-Flash läuft im loop())
+//   prev >= 0, s > prev → Bahnhofs-Öffnungs-Animation auf dem neuen
+//                         Bahnhof (blockierend, ~1.8 s)
+//   prev >= 0, s == NUM_STATIONS-1 → zusätzlich arrivalAnimation()
+//   prev >= 0, s < 0 → Server hat idle'd (15 min Timeout), zurück zu Attract
 void pollApiAndUpdate() {
     Serial.println("API: check…");
     int s = fetchCurrentStation();
-    if (s < 0 || s >= (int)NUM_STATIONS) return;
+    // Plausibilität: Idle-Sentinel -1 oder 0..NUM_STATIONS-1
+    if (s < -1 || s >= (int)NUM_STATIONS) return;
     if (s == currentStation) return;
 
     const int prev = currentStation;
+
+    // Vorwärts-Übergang zwischen zwei echten Bahnhöfen: Öffnungs-
+    // Animation spielen, solange currentStation noch auf dem alten
+    // Wert steht (drawBaseline malt den neuen Bahnhof dann noch rot).
+    if (prev >= 0 && s > prev) {
+        openStationAnimation(s);
+    }
+
     currentStation = s;
-    Serial.printf("Bahnhof: %d (%s)\n",
-                  currentStation, STATION_NAMES[currentStation]);
-
-    resetTrainToCurrent();
-
-    if (currentStation == (int)NUM_STATIONS - 1 && prev != currentStation) {
-        Serial.println("Augsburg erreicht!");
-        arrivalAnimation();
+    if (s >= 0) {
+        Serial.printf("Bahnhof: %d (%s)\n", s, STATION_NAMES[s]);
+        resetTrainToCurrent();
+        if (s == (int)NUM_STATIONS - 1 && prev != s) {
+            Serial.println("Augsburg erreicht!");
+            arrivalAnimation();
+        }
+    } else {
+        Serial.println("Idle (Server-Timeout)");
     }
 }
 
@@ -278,27 +509,52 @@ void setup() {
     delay(200);
     Serial.println("\nVerstehbahnhof-Cache Firmware");
 
+    // Attract-State initialisieren (freie Burst-Slots, kaltes Feuer)
+    for (int i = 0; i < MAX_BURSTS; i++) bursts[i] = { -1, 0, 0, 0, 0 };
+    for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) heat[i] = 0;
+
     strip.begin();
     strip.setBrightness(NEOPIXEL_BRIGHTNESS);
-    drawBaseline();
+    // Start schwarz – Attract zeichnet im ersten Frame
+    for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) strip.setPixelColor(i, 0);
     strip.show();
 
     connectWifi();
 
-    // Einmalige Initialabfrage, damit wir nicht erst auf den ersten
-    // Pendel-Wendepunkt warten müssen.
+    // Einmalige Initialabfrage. Schlägt fehl → currentStation bleibt -1
+    // und der Attract-Modus läuft sofort an.
     pollApiAndUpdate();
 }
 
 void loop() {
     const unsigned long now = millis();
 
-    // Nur noch die Zug-Animation zeittakten. Der API-Abruf passiert
-    // ausschließlich in tickTrainAnimation(), sobald der Zug am
-    // nächsten (roten) Bahnhof ankommt.
-    static unsigned long lastFrame = 0;
-    if (now - lastFrame >= TRAIN_FRAME_MS) {
-        lastFrame = now;
-        tickTrainAnimation();
+    if (currentStation < 0) {
+        // --- Attract-Modus: Feuer + Feuerwerk ---
+        // API muss zeitgesteuert gepollt werden, weil es keinen Wende-
+        // punkt gibt, an dem der Pendel-Poll anschlagen könnte.
+        static unsigned long lastAttractPoll = 0;
+        if (now - lastAttractPoll >= ATTRACT_POLL_MS) {
+            lastAttractPoll = now;
+            int prev = currentStation;
+            pollApiAndUpdate();
+            if (prev < 0 && currentStation >= 0) {
+                transitionFlash();
+            }
+        }
+
+        static unsigned long lastAttractFrame = 0;
+        if (now - lastAttractFrame >= TRAIN_FRAME_MS) {
+            lastAttractFrame = now;
+            tickAttractAnimation();
+        }
+    } else {
+        // --- Normale Pendel-Animation ---
+        // API-Poll passiert am Wendepunkt in tickTrainAnimation.
+        static unsigned long lastFrame = 0;
+        if (now - lastFrame >= TRAIN_FRAME_MS) {
+            lastFrame = now;
+            tickTrainAnimation();
+        }
     }
 }
