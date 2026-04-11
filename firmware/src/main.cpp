@@ -1,8 +1,16 @@
-// Verstehbahnhof-Cache – Wemos D1 Mini Firmware
+// Verstehbahnhof-Cache – Wemos D1 Mini Lite Firmware
 //
 // Pollt eine API (wird parallel von MatzE gebaut) nach dem aktuellen
-// Bahnhof und animiert Emma auf dem NeoPixel-Streifen von ihrem
-// bisherigen Halt zum neuen Halt.
+// Bahnhof und zeigt Emmas Reise von Fürstenberg nach Augsburg auf
+// dem NeoPixel-Streifen.
+//
+// Darstellung:
+//  - Bahnhöfe gleichmäßig über den Streifen verteilt
+//  - bereits erreichte Bahnhöfe: grün
+//  - noch nicht erreichte Bahnhöfe: rot
+//  - bereits befahrene Strecke: dim weiß
+//  - noch nicht befahrene Strecke: aus
+//  - der Zug (blau) pendelt zwischen aktuellem und nächstem Bahnhof
 //
 // API-Antwort (Beispiel):
 //   { "currentStation": 2, "totalStations": 5 }
@@ -16,70 +24,76 @@
 
 #include "config.h"
 
+#ifndef TRAIN_FRAME_MS
+#define TRAIN_FRAME_MS 90
+#endif
+
 Adafruit_NeoPixel strip(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
+// -------- Bahnhöfe --------
+// Namen werden nur fürs Serial-Log benutzt. Positionen auf dem Streifen
+// werden automatisch gleichmäßig verteilt (siehe stationLed()).
+const char* STATION_NAMES[] = {
+    "Lok (Fürstenberg)",
+    "Repair Cafe (Berlin)",
+    "Goldstein (Leipzig)",
+    "Loren (Nürnberg)",
+    "Augsburg (Puppenkiste)"
+};
 static const uint16_t NUM_STATIONS =
-    sizeof(STATION_LEDS) / sizeof(STATION_LEDS[0]);
+    sizeof(STATION_NAMES) / sizeof(STATION_NAMES[0]);
 
-// aktueller Bahnhof laut letztem API-Abruf (−1 = noch nichts animiert)
-int currentStation = -1;
+// LED-Position eines Bahnhofs, gleichmäßig über den Streifen verteilt.
+// Station 0 = LED 0, letzte Station = letzte LED.
+uint16_t stationLed(int idx) {
+    if (idx <= 0) return 0;
+    if (idx >= (int)NUM_STATIONS - 1) return NEOPIXEL_COUNT - 1;
+    return (uint16_t)(((long)idx * (NEOPIXEL_COUNT - 1)) / (NUM_STATIONS - 1));
+}
 
 // -------- Farben --------
-const uint32_t COLOR_TRACK    = Adafruit_NeoPixel::Color(8, 8, 20);    // dunkelblau
-const uint32_t COLOR_STATION  = Adafruit_NeoPixel::Color(40, 40, 40);  // weiss
-const uint32_t COLOR_TRAIN    = Adafruit_NeoPixel::Color(255, 40, 0);  // Emma orange-rot
-const uint32_t COLOR_GOAL     = Adafruit_NeoPixel::Color(0, 180, 60);  // Puppenkiste grün
+const uint32_t COLOR_OFF           = Adafruit_NeoPixel::Color(0, 0, 0);
+const uint32_t COLOR_TRACK_DONE    = Adafruit_NeoPixel::Color(6, 6, 6);     // dim weiß
+const uint32_t COLOR_STATION_DONE  = Adafruit_NeoPixel::Color(0, 150, 0);   // grün
+const uint32_t COLOR_STATION_TODO  = Adafruit_NeoPixel::Color(150, 0, 0);   // rot
+const uint32_t COLOR_TRAIN         = Adafruit_NeoPixel::Color(0, 40, 220);  // blau
+
+// -------- Zustand --------
+int currentStation = -1;  // letzter bekannter Bahnhof (−1 = noch nix)
+int trainPos = 0;          // aktuelle LED-Position des Zugs
+int trainDir = 1;          // Pendel-Richtung: +1 vorwärts, -1 rückwärts
 
 // -------- Darstellung --------
 
+// Malt Strecke + Bahnhöfe (ohne Zug) auf den Puffer.
+// Basiert auf currentStation (kann -1 sein).
 void drawBaseline() {
-    // Schiene
+    const int cs = (currentStation < 0) ? 0 : currentStation;
+    const uint16_t doneUpTo = stationLed(cs);  // bis hierhin gilt Strecke als befahren
+
     for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) {
-        strip.setPixelColor(i, COLOR_TRACK);
+        strip.setPixelColor(i, (i <= doneUpTo) ? COLOR_TRACK_DONE : COLOR_OFF);
     }
-    // Bahnhöfe
+
     for (uint16_t s = 0; s < NUM_STATIONS; s++) {
-        strip.setPixelColor(STATION_LEDS[s], COLOR_STATION);
+        uint32_t col = ((int)s <= cs) ? COLOR_STATION_DONE : COLOR_STATION_TODO;
+        strip.setPixelColor(stationLed(s), col);
     }
-    // Ziel (Augsburg) hervorheben
-    strip.setPixelColor(STATION_LEDS[NUM_STATIONS - 1], COLOR_GOAL);
 }
 
-void drawTrainAt(uint16_t led) {
+void drawWithTrain(int trainLed) {
     drawBaseline();
-    strip.setPixelColor(led, COLOR_TRAIN);
+    if (trainLed >= 0 && trainLed < (int)NEOPIXEL_COUNT) {
+        strip.setPixelColor(trainLed, COLOR_TRAIN);
+    }
     strip.show();
 }
 
-// Fährt Emma LED für LED vom Bahnhof 'from' zum Bahnhof 'to'.
-// Unterstützt Vorwärts und Rückwärts.
-void animateTrain(uint16_t from, uint16_t to) {
-    const uint16_t ledFrom = STATION_LEDS[from];
-    const uint16_t ledTo   = STATION_LEDS[to];
-    const int step = (ledTo >= ledFrom) ? 1 : -1;
-
-    for (int led = ledFrom; led != ledTo; led += step) {
-        drawTrainAt(led);
-        delay(120);  // Geschwindigkeit der Fahrt
-    }
-    drawTrainAt(ledTo);
-
-    // kleiner "Halt"-Blinker am Bahnhof
-    for (int i = 0; i < 2; i++) {
-        delay(150);
-        strip.setPixelColor(ledTo, COLOR_STATION);
-        strip.show();
-        delay(150);
-        strip.setPixelColor(ledTo, COLOR_TRAIN);
-        strip.show();
-    }
-}
-
 void arrivalAnimation() {
-    // kurze Party-Animation, wenn Emma in Augsburg ankommt
-    for (int n = 0; n < 5; n++) {
+    // kurze Party, wenn Emma in Augsburg ankommt
+    for (int n = 0; n < 6; n++) {
         for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) {
-            strip.setPixelColor(i, COLOR_GOAL);
+            strip.setPixelColor(i, COLOR_STATION_DONE);
         }
         strip.show();
         delay(150);
@@ -87,6 +101,44 @@ void arrivalAnimation() {
         strip.show();
         delay(150);
     }
+}
+
+// Setzt die Zug-Position passend zum aktuellen Bahnhof zurück.
+void resetTrainToCurrent() {
+    trainPos = stationLed(currentStation);
+    trainDir = +1;
+}
+
+// Bewegt den Zug einen Schritt weiter und zeichnet das Bild.
+// Der Zug pendelt zwischen currentStation und currentStation+1.
+// Am Ziel (letzter Bahnhof) steht der Zug still.
+void tickTrainAnimation() {
+    if (currentStation < 0) {
+        drawBaseline();
+        strip.show();
+        return;
+    }
+
+    // Am Ziel angekommen: keine Bewegung, alles grün, kein Zug gezeichnet
+    if (currentStation >= (int)NUM_STATIONS - 1) {
+        drawBaseline();
+        strip.show();
+        return;
+    }
+
+    const int ledA = stationLed(currentStation);
+    const int ledB = stationLed(currentStation + 1);
+
+    trainPos += trainDir;
+    if (trainPos >= ledB) {
+        trainPos = ledB;
+        trainDir = -1;
+    } else if (trainPos <= ledA) {
+        trainPos = ledA;
+        trainDir = +1;
+    }
+
+    drawWithTrain(trainPos);
 }
 
 // -------- Netzwerk --------
@@ -135,8 +187,7 @@ int fetchCurrentStation() {
         return -1;
     }
 
-    int cs = doc["currentStation"] | -1;
-    return cs;
+    return doc["currentStation"] | -1;
 }
 
 // -------- Setup / Loop --------
@@ -149,41 +200,40 @@ void setup() {
     strip.begin();
     strip.setBrightness(NEOPIXEL_BRIGHTNESS);
     drawBaseline();
-    // Emma beim Start auf Bahnhof 0 setzen
-    strip.setPixelColor(STATION_LEDS[0], COLOR_TRAIN);
     strip.show();
 
     connectWifi();
 }
 
 void loop() {
+    const unsigned long now = millis();
+
+    // --- API-Polling ---
     static unsigned long lastPoll = 0;
-    if (millis() - lastPoll < API_POLL_MS) {
-        delay(20);
-        return;
-    }
-    lastPoll = millis();
+    if (now - lastPoll >= API_POLL_MS) {
+        lastPoll = now;
+        int s = fetchCurrentStation();
+        if (s >= 0 && s < (int)NUM_STATIONS && s != currentStation) {
+            const int prev = currentStation;
+            currentStation = s;
+            Serial.printf("Bahnhof: %d (%s)\n",
+                          currentStation, STATION_NAMES[currentStation]);
 
-    int newStation = fetchCurrentStation();
-    if (newStation < 0 || newStation >= (int)NUM_STATIONS) return;
+            // Zug auf den neuen Bahnhof setzen und von dort aus pendeln
+            resetTrainToCurrent();
 
-    if (currentStation < 0) {
-        // erster Abruf: Emma ohne Animation an die richtige Stelle setzen
-        currentStation = newStation;
-        drawTrainAt(STATION_LEDS[currentStation]);
-        Serial.printf("Start auf Bahnhof %d\n", currentStation);
-        return;
-    }
-
-    if (newStation != currentStation) {
-        Serial.printf("Fahrt: Bahnhof %d -> %d\n", currentStation, newStation);
-        animateTrain(currentStation, newStation);
-        currentStation = newStation;
-
-        if (currentStation == (int)NUM_STATIONS - 1) {
-            Serial.println("Augsburg erreicht!");
-            arrivalAnimation();
-            drawTrainAt(STATION_LEDS[currentStation]);
+            // Ziel erreicht? → Ankunfts-Show
+            if (currentStation == (int)NUM_STATIONS - 1 && prev != currentStation) {
+                Serial.println("Augsburg erreicht!");
+                arrivalAnimation();
+            }
         }
+    }
+
+    // --- Zug-Animation (pendelt zwischen currentStation und currentStation+1) ---
+    static unsigned long lastFrame = 0;
+    if (now - lastFrame >= TRAIN_FRAME_MS) {
+        lastFrame = now;
+        tickTrainAnimation();
     }
 }
