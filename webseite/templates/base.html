@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Verstehbahnhof{% endblock %}</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #111214;
+      --surface:   #1c1f23;
+      --border:    #3a3f47;
+      --accent:    #c8960c;
+      --accent2:   #7a5c00;
+      --text:      #d4cfc8;
+      --muted:     #6b7280;
+      --green:     #4a9e5c;
+      --red:       #9e4a4a;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1rem;
+    }
+
+    header {
+      width: 100%;
+      max-width: 640px;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    header .logo {
+      font-size: 1.05rem;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.25rem;
+    }
+
+    header .separator {
+      color: var(--border);
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    main {
+      width: 100%;
+      max-width: 640px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    p {
+      line-height: 1.65;
+      font-size: 0.92rem;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+
+    p:last-child { margin-bottom: 0; }
+
+    .hint-box {
+      background: var(--bg);
+      border-left: 3px solid var(--accent);
+      padding: 0.75rem 1rem;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .hint-box .hint-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .meta-row span { white-space: nowrap; }
+
+    .stars { color: var(--accent); }
+    .stars .empty { color: var(--border); }
+
+    footer {
+      width: 100%;
+      max-width: 640px;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    {% block extra_style %}{% endblock %}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">&#x1F682; VERSTEHBAHNHOF FÜRSTENBERG (HALLE)</div>
+    <h1>{% block header_title %}Jim Knopfs Abenteuer{% endblock %}</h1>
+    <div class="separator">&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;</div>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer>
+    VERSTEHBAHNHOF &nbsp;&#x25A0;&nbsp; FÜRSTENBERG (HALLE) &nbsp;&#x25A0;&nbsp; GC-VSTBHF
+  </footer>
+</body>
+</html>

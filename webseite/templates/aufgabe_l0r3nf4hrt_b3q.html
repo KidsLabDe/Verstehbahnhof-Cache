@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Finale – Jim Knopf fährt nach Hause{% endblock %}
+{% block header_title %}Station 4 / 4 – Finale!{% endblock %}
+
+{% block extra_style %}
+@keyframes pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 8px var(--accent); }
+  50% { opacity: 0.7; text-shadow: 0 0 20px var(--accent); }
+}
+
+.finale-title {
+  animation: pulse 2s infinite;
+  color: var(--accent);
+  font-size: 1.4rem;
+  text-align: center;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.5rem 0 1rem;
+}
+{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align:center;">
+  <div class="finale-title">&#x1F682; Glückwunsch! &#x1F682;</div>
+  <div class="card-label">Jim Knopf sagt</div>
+  <p style="margin-top:0.75rem;">
+    <em>
+      „Ich hab's! Schloss, Goldstein, Lore – alles da!
+      Emma und ich können endlich nach Augsburg zurückfahren.
+      Du hast mir das Leben gerettet!"
+    </em>
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">Du hast es geschafft</div>
+  <h2>Die finale Box</h2>
+  <p>
+    Hier bei der Lore ist die finale Cache-Box versteckt.
+    Trag dich ins Logbuch ein und hinterlasse Jim Knopf eine Botschaft
+    für seine Weiterreise.
+  </p>
+  <p>
+    Vergiss nicht, den Fund auch online auf geocaching.com einzutragen!
+  </p>
+  <div class="hint-box">
+    <div class="hint-label">TFTC</div>
+    Thanks for this cache &nbsp;&#x2014;&nbsp;
+    Danke fürs Mitspielen!
+  </div>
+</div>
+
+<div class="card" style="text-align:center;">
+  <p style="font-size:0.82rem;color:var(--muted);">
+    Cache gelegt vom Verstehbahnhof Fürstenberg (Halle).<br>
+    Alle Stationen: Lock &#x2192; Repair Café &#x2192; Goldstein &#x2192; Lore
+  </p>
+</div>
+{% endblock %}

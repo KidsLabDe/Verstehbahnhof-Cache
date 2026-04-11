@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Aufgabe 2 – Hmm...{% endblock %}
+{% block header_title %}Du hast gezählt.{% endblock %}
+
+{% block extra_style %}
+@keyframes countup {
+  from { content: "0000"; }
+}
+
+.counter {
+  font-size: 3rem;
+  color: var(--accent);
+  text-align: center;
+  padding: 2rem 0 1rem;
+  letter-spacing: 0.2em;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.blink {
+  animation: blink 1.2s infinite;
+  color: var(--muted);
+}
+{% endblock %}
+
+{% block content %}
+<div class="card" style="text-align:center;">
+  <div class="card-label">Easter Egg</div>
+  <div class="counter" id="counter">0000</div>
+  <h2>Respekt.</h2>
+  <p>
+    Du hast hochgezählt. Das verdient Anerkennung.
+  </p>
+  <p>
+    Leider ist dies kein Teil des Rätsels.<br>
+    Hier gibt es nichts zu finden.
+  </p>
+  <p class="blink" style="font-size:0.82rem;margin-top:1rem;">
+    … oder doch?
+  </p>
+  <p style="font-size:0.78rem;color:var(--muted);margin-top:0.5rem;">
+    Nein. Wirklich nicht. Geh zurück.
+  </p>
+</div>
+
+<script>
+  const el = document.getElementById("counter");
+  let n = 2;
+  setInterval(() => {
+    el.textContent = String(n).padStart(4, "0");
+    n++;
+  }, 80);
+</script>
+{% endblock %}
