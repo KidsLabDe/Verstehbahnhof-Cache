@@ -20,14 +20,19 @@
 #define API_TIMEOUT_MS  1500
 
 // --- NeoPixel ---
-// D2 am Wemos D1 Mini (Lite) == GPIO4 (sicherer Pin, keine Boot-Konflikte)
+// D2 am Wemos D1 Mini == GPIO4 (sicherer Pin, keine Boot-Konflikte)
 #define NEOPIXEL_PIN    D2
-#define NEOPIXEL_COUNT  30      // LEDs auf dem Streifen insgesamt
+#define NEOPIXEL_COUNT  64   // LEDs auf dem Streifen insgesamt
 #define NEOPIXEL_BRIGHTNESS 80  // 0..255
+
+// LED-Positionen der Bahnhöfe auf dem Streifen (0-basiert).
+// Reihenfolge: Fürstenberg → Berlin → Leipzig → Nürnberg → Augsburg.
+// Anzahl muss mit STATION_NAMES[] in main.cpp übereinstimmen (5 Einträge).
+static const uint16_t STATION_LEDS[] = { 0, 14, 31, 48, 63 };
 
 // Wie schnell der Zug zwischen zwei Bahnhöfen pendelt (ms pro LED-Schritt).
 // Kleinere Zahl = schneller. 18 ≈ 55 fps.
-#define TRAIN_FRAME_MS  18
+#define TRAIN_FRAME_MS  90
 
 // Anzahl Waggons hinter der Lok (dunkler werdendes Blau)
 #define NUM_WAGONS      3
@@ -41,6 +46,5 @@
 #define BURST_FADE         12     // Helligkeitsabfall pro Frame 0..255
 #define BURST_SPAWN_CHANCE 8      // Promille pro Frame neuer Burst
 
-// Die Bahnhöfe selbst (Namen + Reihenfolge) stehen in main.cpp in
-// STATION_NAMES[]. Die Positionen auf dem Streifen werden automatisch
-// gleichmäßig verteilt – du musst hier nur NEOPIXEL_COUNT korrekt setzen.
+// Die Bahnhofsnamen stehen in main.cpp in STATION_NAMES[]. Werden nur
+// fürs Serial-Log benutzt.

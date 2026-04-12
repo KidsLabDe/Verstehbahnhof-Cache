@@ -56,8 +56,8 @@
 Adafruit_NeoPixel strip(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 // -------- Bahnhöfe --------
-// Namen werden nur fürs Serial-Log benutzt. Positionen auf dem Streifen
-// werden automatisch gleichmäßig verteilt (siehe stationLed()).
+// Namen werden nur fürs Serial-Log benutzt.
+// LED-Positionen werden aus STATION_LEDS[] in config.h gelesen.
 const char* STATION_NAMES[] = {
     "Lok (Fürstenberg)",
     "Repair Cafe (Berlin)",
@@ -68,12 +68,15 @@ const char* STATION_NAMES[] = {
 static const uint16_t NUM_STATIONS =
     sizeof(STATION_NAMES) / sizeof(STATION_NAMES[0]);
 
-// LED-Position eines Bahnhofs, gleichmäßig über den Streifen verteilt.
-// Station 0 = LED 0, letzte Station = letzte LED.
+// Sicherheitscheck: STATION_LEDS und STATION_NAMES müssen gleich lang sein.
+static_assert(sizeof(STATION_LEDS) / sizeof(STATION_LEDS[0]) == NUM_STATIONS,
+    "STATION_LEDS in config.h muss genauso viele Eintraege haben wie STATION_NAMES in main.cpp");
+
+// LED-Position eines Bahnhofs – liest aus STATION_LEDS[] (config.h).
 uint16_t stationLed(int idx) {
-    if (idx <= 0) return 0;
-    if (idx >= (int)NUM_STATIONS - 1) return NEOPIXEL_COUNT - 1;
-    return (uint16_t)(((long)idx * (NEOPIXEL_COUNT - 1)) / (NUM_STATIONS - 1));
+    if (idx < 0) return STATION_LEDS[0];
+    if (idx >= (int)NUM_STATIONS) return STATION_LEDS[NUM_STATIONS - 1];
+    return STATION_LEDS[idx];
 }
 
 // -------- Farben --------
