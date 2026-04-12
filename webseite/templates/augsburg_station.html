@@ -1,0 +1,27 @@
+{% extends "base_augsburg.html" %}
+
+{% block title %}Station {{ station_num }} – Augsburg Cache{% endblock %}
+{% block header_title %}Station {{ station_num }} / {{ num_stations - 1 }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <p>[ TODO: Aufgaben-Text für Station {{ station_num }}. Was hat der Spieler gefunden / erlebt? ]</p>
+</div>
+
+<div class="card">
+  <div class="card-label">Nächster Schritt</div>
+  <h2>Geh zurück zum Start-QR</h2>
+  <p>
+    Scanne nochmal den Start-QR des Augsburg Cache.<br>
+    {% if station_num < num_stations - 1 %}
+    Dann wird die nächste Station freigeschaltet.
+    {% else %}
+    Dann geht es ins Finale!
+    {% endif %}
+  </p>
+  <details class="tipp-box">
+    <summary>Nichts gefunden? Tipp anzeigen</summary>
+    <p>[ TODO: Hinweis für Station {{ station_num }} – wo genau ist der QR-Code? ]</p>
+  </details>
+</div>
+{% endblock %}

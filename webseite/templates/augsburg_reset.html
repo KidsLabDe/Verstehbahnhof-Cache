@@ -1,0 +1,26 @@
+{% extends "base_augsburg.html" %}
+
+{% block title %}Spielstand zurücksetzen – Augsburg Cache{% endblock %}
+{% block header_title %}Reset{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-label">Achtung</div>
+  <h2>Wirklich zurücksetzen?</h2>
+  <p>
+    Der aktuelle Spielstand des Augsburg Cache wird gelöscht und das Spiel
+    beginnt von vorne. Das Logbuch bleibt erhalten.
+  </p>
+  <p style="margin-top:1rem;">
+    <a href="/augsburg/reset/confirm"
+       style="color:var(--red);text-decoration:underline;">
+      Ja, Spielstand löschen
+    </a>
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <a href="/augsburg/start"
+       style="color:var(--muted);text-decoration:underline;">
+      Abbrechen
+    </a>
+  </p>
+</div>
+{% endblock %}

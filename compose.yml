@@ -11,8 +11,16 @@ services:
       - LOG_DIR=/app/log
       # Timeouts in Minuten. Zum Ändern einfach die Werte hier anpassen
       # und "docker compose up -d" neu aufrufen.
-      - INACTIVITY_TIMEOUT_MIN=15   # während des Spiels
-      - ARRIVED_TIMEOUT_MIN=5       # nach dem Finale (nächste Gruppe)
+      - INACTIVITY_TIMEOUT_MIN=15   # VB: während des Spiels
+      - ARRIVED_TIMEOUT_MIN=5       # VB: nach dem Finale (nächste Gruppe)
+      # Augsburg Cache
+      - AUG_NUM_STATIONS=3          # Anzahl Stationen (inkl. Finale)
+      - AUG_INACTIVITY_TIMEOUT_MIN=15
+      - AUG_ARRIVED_TIMEOUT_MIN=5
+      # Täglicher Telegram-Report (23:55 Uhr)
+      # Beide Werte in .env oder direkt hier eintragen:
+      - TELEGRAM_BOT_TOKEN=         # Bot-Token von BotFather
+      - TELEGRAM_CHAT_ID=           # Chat-ID oder Channel-ID (z.B. -1001234567890)
     networks:
       - proxy
     labels:
@@ -28,17 +36,20 @@ services:
       - "traefik.http.middlewares.verstehbahnhof-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.middlewares.verstehbahnhof-headers.headers.customrequestheaders.X-Forwarded-Host=verstehbahnhof.kidslab.de"
       - "traefik.http.services.verstehbahnhof.loadbalancer.server.port=5000"
-      # HTTP Router with redirect to HTTPS
+      # HTTP Router mit Redirect auf HTTPS
       - "traefik.http.routers.verstehbahnhof-http.rule=Host(`verstehbahnhof.kidslab.de`)"
       - "traefik.http.routers.verstehbahnhof-http.entryPoints=web"
       - "traefik.http.routers.verstehbahnhof-http.middlewares=verstehbahnhof-redirect"
       - "traefik.http.middlewares.verstehbahnhof-redirect.redirectscheme.scheme=https"
       - "traefik.http.middlewares.verstehbahnhof-redirect.redirectscheme.permanent=true"
-      # HTTP Router for /state (ohne Redirect – wird von der ESP8266-Firmware
-      # per plain http abgefragt, HTTPS+BearSSL auf dem ESP ist zu wackelig)
+      # HTTP Router für /state (ohne Redirect – ESP8266 kann kein BearSSL)
       - "traefik.http.routers.verstehbahnhof-api.rule=Host(`verstehbahnhof.kidslab.de`) && Path(`/state`)"
       - "traefik.http.routers.verstehbahnhof-api.entryPoints=web"
       - "traefik.http.routers.verstehbahnhof-api.service=verstehbahnhof"
+      # HTTP Router für /augsburg/state (ohne Redirect – ESP32 Augsburg-Firmware)
+      - "traefik.http.routers.verstehbahnhof-aug-api.rule=Host(`verstehbahnhof.kidslab.de`) && Path(`/augsburg/state`)"
+      - "traefik.http.routers.verstehbahnhof-aug-api.entryPoints=web"
+      - "traefik.http.routers.verstehbahnhof-aug-api.service=verstehbahnhof"
 
 volumes:
   state:

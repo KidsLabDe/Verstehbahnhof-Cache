@@ -115,8 +115,7 @@
     deinen Eintrag und alle bisherigen Logbuch-Einträge.
   </p>
   <div class="btn-row">
-    <a class="btn" href="/aufgabe_st4rt_v9p">Zurück zum Finale</a>
-    <a class="btn" href="/reset">Spielstand zurücksetzen</a>
+    <a class="btn" href="{{ finale_url | default('/aufgabe_st4rt_v9p') }}">Zurück zum Finale</a>
   </div>
 </div>
 {% endif %}

@@ -1,0 +1,3 @@
+# Täglicher Report um 23:55 Uhr
+# Ausgabe landet auf stdout von PID 1 (gunicorn) → docker compose logs
+55 23 * * * cd /app && python daily_report.py >> /proc/1/fd/1 2>&1

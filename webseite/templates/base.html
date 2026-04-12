@@ -118,6 +118,65 @@
       margin-bottom: 0.3rem;
     }
 
+    /* Aufklappbare Hinweise auf Stations-Seiten */
+    details.tipp-box {
+      background: var(--bg);
+      border-left: 3px solid var(--muted);
+      padding: 0.6rem 1rem;
+      margin-top: 1rem;
+    }
+    details.tipp-box[open] { border-left-color: var(--accent); }
+    details.tipp-box summary {
+      cursor: pointer;
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      list-style: none;
+      user-select: none;
+    }
+    details.tipp-box summary::-webkit-details-marker { display: none; }
+    details.tipp-box[open] summary { color: var(--accent); margin-bottom: 0.55rem; }
+    details.tipp-box summary::before { content: "▶  "; }
+    details.tipp-box[open] summary::before { content: "▼  "; }
+    details.tipp-box p { font-size: 0.88rem; color: var(--text); margin-bottom: 0; }
+
+    /* Logbuch-Formular (VB Finale + Augsburg Finale) */
+    .logbook-form { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.75rem; }
+    .logbook-form label {
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .logbook-form input, .logbook-form textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.75rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      width: 100%;
+    }
+    .logbook-form input:focus, .logbook-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    .logbook-form textarea { min-height: 6rem; resize: vertical; }
+    .logbook-form button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 0.75rem 1rem;
+      font-family: inherit;
+      font-size: 0.88rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .logbook-form button:hover { background: #ffdd55; }
+
     .meta-row {
       display: flex;
       gap: 1.5rem;
@@ -149,7 +208,7 @@
 </head>
 <body>
   <header>
-    <div class="logo">&#x1F682; VERSTEHBAHNHOF FÜRSTENBERG (HAVEL)</div>
+    <div class="logo">{% block game_logo %}&#x1F682; VERSTEHBAHNHOF FÜRSTENBERG (HAVEL){% endblock %}</div>
     <h1>{% block header_title %}Jim Knopfs Abenteuer{% endblock %}</h1>
     <div class="separator">&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;&#x2550;</div>
   </header>
@@ -157,7 +216,7 @@
     {% block content %}{% endblock %}
   </main>
   <footer>
-    VERSTEHBAHNHOF &nbsp;&#x25A0;&nbsp; FÜRSTENBERG (HALLE) &nbsp;&#x25A0;&nbsp; GC-VSTBHF
+    {% block game_footer %}VERSTEHBAHNHOF &nbsp;&#x25A0;&nbsp; FÜRSTENBERG (HALLE) &nbsp;&#x25A0;&nbsp; GC-VSTBHF{% endblock %}
   </footer>
 </body>
 </html>

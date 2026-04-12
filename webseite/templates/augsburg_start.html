@@ -1,0 +1,174 @@
+{% extends "base_augsburg.html" %}
+
+{% block title %}
+{%- if kind == "started" -%}Start – Augsburg Cache
+{%- elif kind == "advanced" -%}Weiter!
+{%- elif kind == "arrived" -%}Finale – Geschafft!
+{%- else -%}Noch nicht so weit
+{%- endif -%}
+{% endblock %}
+
+{% block header_title %}
+{%- if kind == "arrived" -%}Finale!
+{%- elif kind == "started" -%}Station 0 / {{ num_stations - 1 }}
+{%- else -%}Station {{ station }} / {{ num_stations - 1 }}
+{%- endif -%}
+{% endblock %}
+
+{% block extra_style %}
+{% if kind == "arrived" %}
+@keyframes pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 8px var(--accent); }
+  50%       { opacity: 0.7; text-shadow: 0 0 20px var(--accent); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.finale-title {
+  animation: pulse 2s infinite;
+  color: var(--accent);
+  font-size: 1.6rem;
+  text-align: center;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.5rem 0 1rem;
+}
+.finale-banner {
+  background: linear-gradient(90deg,
+    var(--accent2) 0%,
+    var(--accent) 25%,
+    #ffdd55 50%,
+    var(--accent) 75%,
+    var(--accent2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 4s linear infinite;
+  color: var(--bg);
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: bold;
+  border: 2px solid var(--accent);
+}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{# --- Fall 1: Spiel wird gerade gestartet --- #}
+{% if kind == "started" %}
+<div class="card">
+  <div class="card-label">Willkommen</div>
+  <h2>[ TODO: Titel der Geschichte ]</h2>
+  <p>[ TODO: Einleitungstext – Worum geht es beim Augsburg-Cache? Was ist die Geschichte? ]</p>
+</div>
+
+<div class="card">
+  <div class="card-label">Erste Aufgabe</div>
+  <h2>[ TODO: Such Aufgabe 1 ]</h2>
+  <p>[ TODO: Wo ist der erste QR-Code versteckt? ]</p>
+  <div class="hint-box">
+    <div class="hint-label">Deine Aufgabe</div>
+    [ TODO: Kurze Aufgabenbeschreibung für Station 1. ]
+  </div>
+</div>
+
+{# --- Fall 2: Nächste Station wird freigeschaltet --- #}
+{% elif kind == "advanced" %}
+<div class="card">
+  <div class="card-label">Weiter!</div>
+  <h2>Station {{ station }} freigeschaltet</h2>
+  <p>[ TODO: Text nach dem Freischalten – was passiert als nächstes in der Geschichte? ]</p>
+  <p>[ TODO: Nächster Halt: <strong>Ort {{ station }}</strong>. ]</p>
+</div>
+
+<div class="card">
+  <div class="card-label">Nächste Aufgabe</div>
+  <h2>Such den nächsten QR-Code</h2>
+  <div class="hint-box">
+    <div class="hint-label">Deine Aufgabe</div>
+    [ TODO: Hinweis wo der QR-Code für Station {{ station }} zu finden ist. ]<br>
+    Scanne ihn und komm hierher zurück.
+  </div>
+</div>
+
+{# --- Fall 3: Zu früh zurück, Aufgabe noch offen --- #}
+{% elif kind == "pending" %}
+<div class="card">
+  <div class="card-label">Noch nicht …</div>
+  <h2>Erst die Aufgabe lösen!</h2>
+  <p>[ TODO: „Zu früh zurück"-Text. Was muss der Spieler noch tun? ]</p>
+  <div class="hint-box">
+    <div class="hint-label">Hinweis</div>
+    Scanne erst den QR-Code an der aktuellen Aufgabe.<br>
+    Danach kommst du hier wieder vorbei.
+  </div>
+</div>
+
+{# --- Fall 4: Finale --- #}
+{% else %}
+<div class="finale-banner">
+  &#x1F386; &nbsp; [ TODO: Finale-Banner-Text ] &nbsp; &#x1F386;
+</div>
+
+<div class="card" style="text-align:center;">
+  <div class="finale-title">&#x1F3C6; Geschafft! &#x1F3C6;</div>
+  <div class="card-label">[ TODO: Sprecher ]</div>
+  <p style="margin-top:0.75rem;">
+    <em>
+      [ TODO: Abschlusstext der Geschichte – was sagt der Erzähler am Ende? ]
+    </em>
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">Logbuch</div>
+  <h2>Hinterlass eine Nachricht</h2>
+  <p>[ TODO: Einleitungstext zum Logbuch. ]</p>
+  <form class="logbook-form" action="/augsburg/logbook" method="post">
+    <div>
+      <label for="lb-name">Dein Name</label>
+      <input id="lb-name" name="name" type="text" maxlength="100" required
+             placeholder="z.B. Team XYZ" />
+    </div>
+    <div>
+      <label for="lb-comment">Dein Gruß</label>
+      <textarea id="lb-comment" name="comment" maxlength="2000" required
+                placeholder="Danke für diesen Cache!"></textarea>
+    </div>
+    <button type="submit">Ins Logbuch eintragen</button>
+  </form>
+  <p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem;">
+    <a href="/augsburg/logbook" style="color:var(--muted);text-decoration:underline;">
+      Alle bisherigen Einträge ansehen
+    </a>
+  </p>
+</div>
+
+<div class="card">
+  <div class="card-label">Cache-Fund</div>
+  <h2>Die finale Box</h2>
+  <p>[ TODO: Wo ist die physische Cache-Box in Augsburg? Koordinaten / Beschreibung. ]</p>
+  <div class="hint-box">
+    <div class="hint-label">TFTC</div>
+    Thanks for this cache &nbsp;&#x2014;&nbsp;
+    Danke fürs Mitspielen!
+  </div>
+</div>
+{% endif %}
+
+{% if kind == "started" or kind == "arrived" %}
+<div class="card" style="text-align:center;">
+  <p>
+    <a href="/augsburg/reset"
+       style="color:var(--muted);text-decoration:underline;font-size:0.8rem;">
+      Spielstand zurücksetzen
+    </a>
+  </p>
+</div>
+{% endif %}
+
+{% endblock %}

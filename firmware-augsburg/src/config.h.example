@@ -1,0 +1,40 @@
+#pragma once
+
+// Kopiere diese Datei nach config.h und trage echte Werte ein.
+// config.h ist in .gitignore und wird nicht eingecheckt.
+
+// --- WLAN ---
+#define WIFI_SSID       "DEIN_WLAN"
+#define WIFI_PASSWORD   "DEIN_PASSWORT"
+
+// --- API ---
+// Augsburg-Cache pollt /augsburg/state (plain HTTP, kein TLS nötig).
+// Der ESP32 könnte auch HTTPS, aber plain HTTP ist einfacher und
+// konsistent mit der Verstehbahnhof-Firmware.
+#define API_URL         "http://verstehbahnhof.kidslab.de/augsburg/state"
+#define API_TIMEOUT_MS  2000
+
+// --- NeoPixel ---
+// Auf dem ESP32 gibt es keine D-Pin-Aliase – GPIO-Nummer direkt angeben.
+// GPIO 4 ist ein sicherer Pin ohne Boot-Konflikte.
+#define NEOPIXEL_PIN        4
+#define NEOPIXEL_COUNT      30      // LEDs auf dem Streifen – anpassen!
+#define NEOPIXEL_BRIGHTNESS 80      // 0..255
+
+// Zuggeschwindigkeit (ms pro LED-Schritt). Kleiner = schneller.
+#define TRAIN_FRAME_MS  18
+#define NUM_WAGONS      3
+
+// Attract-Modus (Feuer + Feuerwerk), während niemand spielt.
+// Farbe: kühles Blau/Cyan statt warmes Rot/Gelb (visuell vom VB-Gerät
+// unterscheidbar, falls beide Geräte im gleichen Raum stehen).
+#define ATTRACT_POLL_MS    10000
+#define FIRE_COOLING       60
+#define FIRE_SPARKING      110
+#define MAX_BURSTS         6
+#define BURST_FADE         10
+#define BURST_SPAWN_CHANCE 8
+
+// Anzahl Stationen des Augsburg Cache (muss mit AUG_NUM_STATIONS in
+// compose.yml übereinstimmen; Standard 3).
+#define NUM_STATIONS    3
