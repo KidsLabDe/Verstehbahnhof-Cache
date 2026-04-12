@@ -167,7 +167,10 @@ def touch(data=None):
 
 def mark_task_done(required_station):
     """Markiert die Task am required_station als erledigt. Wenn der
-    Spieler nicht dort ist, passiert nichts außer einem touch."""
+    Spieler nicht dort ist, passiert nichts außer einem touch.
+
+    Returns (data, matched): matched=True nur beim ersten erfolgreichen Scan.
+    """
     data = get_state()
     matched = (data["station"] == required_station and not data["task_done"])
     if matched:
@@ -179,7 +182,7 @@ def mark_task_done(required_station):
               current=data["station"],
               matched=matched,
               task_done=data["task_done"])
-    return data
+    return data, matched
 
 
 def scan_start_qr_impl():
@@ -263,8 +266,8 @@ def aufgabe_start():
 
 @app.route("/aufgabe1")
 def aufgabe1():
-    mark_task_done(STATION_FURSTENBERG)
-    return render_template("aufgabe1.html")
+    _, matched = mark_task_done(STATION_FURSTENBERG)
+    return render_template("aufgabe1.html", already_done=not matched)
 
 
 @app.route("/aufgabe_w3rkst4tt_k9p")
@@ -274,20 +277,20 @@ def aufgabe_repair():
     # auf die echte Repair-Café-Seite umgeleitet.
     if data["station"] < STATION_BERLIN:
         return redirect("https://reparaturbahnhof.de/")
-    mark_task_done(STATION_BERLIN)
-    return render_template("aufgabe_w3rkst4tt_k9p.html")
+    _, matched = mark_task_done(STATION_BERLIN)
+    return render_template("aufgabe_w3rkst4tt_k9p.html", already_done=not matched)
 
 
 @app.route("/aufgabe_g0ldst3in_m7x")
 def aufgabe_gold():
-    mark_task_done(STATION_LEIPZIG)
-    return render_template("aufgabe_g0ldst3in_m7x.html")
+    _, matched = mark_task_done(STATION_LEIPZIG)
+    return render_template("aufgabe_g0ldst3in_m7x.html", already_done=not matched)
 
 
 @app.route("/aufgabe_l0r3nf4hrt_b3q")
 def aufgabe_lore():
-    mark_task_done(STATION_NURNBERG)
-    return render_template("aufgabe_l0r3nf4hrt_b3q.html")
+    _, matched = mark_task_done(STATION_NURNBERG)
+    return render_template("aufgabe_l0r3nf4hrt_b3q.html", already_done=not matched)
 
 
 @app.route("/reset")

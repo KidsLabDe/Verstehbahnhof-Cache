@@ -98,18 +98,9 @@
   <div class="card-label">Notruf aus Fürstenberg</div>
   <h2>Emma steckt fest!</h2>
   <p>
-    Willkommen, Entdecker:in! Jim Knopf, Lukas der Lokomotivführer und die
-    kleine Lok Emma sind eigentlich auf dem Heimweg nach Augsburg zur
-    Puppenkiste – doch sie sind im Verstehbahnhof Fürstenberg gestrandet.
-  </p>
-  <p>
-    <em>„Das Schloss an Emmas Feuerbüchse ist zu"</em>, seufzt Jim.
-    <em>„Ohne Schlüssel kein Feuer, ohne Feuer kein Dampf,
-    ohne Dampf kein Augsburg …"</em>
-  </p>
-  <p>
-    Auf der Strecke vor dir flackert das Lagerfeuer – Emma wartet, dass
-    jemand das Schloss findet und die Reise beginnt.
+    Willkommen, Entdecker:in! Jim Knopf und Lukas der Lokomotivführer sind
+    auf dem Heimweg nach Augsburg zur Puppenkiste – doch Emma ist verschwunden
+    und sie sitzen im Verstehbahnhof fest.
   </p>
 </div>
 
@@ -117,9 +108,8 @@
   <div class="card-label">Erste Aufgabe</div>
   <h2>Such das Lok-Bild</h2>
   <p>
-    Irgendwo im Verstehbahnhof hängt ein großes Bild von Emma. Dort ist
-    der nächste QR-Code versteckt – scanne ihn, um Jim beim Schloss zu
-    helfen. Komm danach zurück zu Emma!
+    Irgendwo im Verstehbahnhof hängt ein großes Bild einer Lokomotive.
+    Dort ist der nächste QR-Code versteckt. Komm danach zurück zur Karte!
   </p>
   <div class="hint-box">
     <div class="hint-label">Deine Aufgabe</div>
@@ -140,18 +130,17 @@
   </p>
   {% if station == 1 %}
   <p>
-    Nächster Halt: <strong>Berlin</strong>. Dort gibt es ein Repair Café,
-    in dem Jim das Schloss wieder gangbar kriegen kann.
+    Nächster Halt: <strong>Berlin</strong>. Emma ist kaputt – sie muss repariert werden.
   </p>
   {% elif station == 2 %}
   <p>
-    Nächster Halt: <strong>Leipzig</strong>. Jim hat seinen Goldstein
-    verloren – er muss ihn dringend wiederfinden.
+    Nächster Halt: <strong>Leipzig</strong>. Die Lok funktioniert!
+    Jetzt muss der Schatz eingesammelt werden – finde den goldenen Stein!
   </p>
   {% elif station == 3 %}
   <p>
-    Nächster Halt: <strong>Nürnberg</strong>. Emma braucht einen Anschub –
-    Zeit, eine Lore zu finden.
+    Nächster Halt: <strong>Nürnberg</strong>. Wie transportieren wir den Schatz?
+    Finde die Loren in der Umgebung – dort ist auch die finale Box.
   </p>
   {% endif %}
 </div>
@@ -164,9 +153,11 @@
     {% if station == 1 %}
       Finde das Repair-Café-Plakat im Verstehbahnhof.
     {% elif station == 2 %}
-      Suche den Goldstein auf dem Gelände.
+      Suche den goldenen Stein auf dem Gelände.<br>
+      Vom Stein aus siehst du ein gelbes G – über dem ist der nächste QR-Code.
     {% elif station == 3 %}
-      Finde die Lore auf dem Gelände.
+      Finde die Loren auf dem Gelände.<br>
+      Dort ist auch die finale Cache-Box versteckt.
     {% endif %}
     <br>
     Scanne dort den QR-Code und komm wieder hierher zurück.
@@ -209,7 +200,7 @@
   <div class="card-label">Jim Knopf sagt</div>
   <p style="margin-top:0.75rem;">
     <em>
-      „Du hast es geschafft! Schloss, Repair Café, Goldstein, Lore –
+      „Du hast es geschafft! Lok-Bild, Repair Café, Goldstein, Lore –
       alles da! Emma und ich rollen endlich wieder nach Hause zur
       Augsburger Puppenkiste. Das vergessen wir dir nie!"
     </em>

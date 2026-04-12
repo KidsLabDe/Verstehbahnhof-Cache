@@ -4,13 +4,20 @@
 {% block header_title %}Station 4 / 4{% endblock %}
 
 {% block content %}
+{% if already_done %}
+<div class="warning-card">
+  <div class="card-label">Zu früh zurück!</div>
+  <p>Du hast diesen QR-Code schon gescannt. Geh zurück zur Karte und scanne den Start-QR.</p>
+</div>
+{% endif %}
+
 <div class="card">
   <p>Du hast die Lore gefunden! Jetzt kann Emma zurück nach Augsburg rollen.</p>
 </div>
 
 <div class="card">
   <div class="card-label">Letzter Schritt</div>
-  <h2>Geh zurück zum Start-QR</h2>
+  <h2>Geh zurück zur Karte</h2>
   <p>
     Scanne den Start-QR ein letztes Mal –<br>
     dann fährt Emma nach Augsburg!
