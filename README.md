@@ -3,7 +3,7 @@
 Ein interaktiver GeoCache für den [Verstehbahnhof](https://verstehbahnhof.de/)
 in Fürstenberg/Havel. Besucher:innen helfen Jim Knopf, seine Lok Emma
 von Fürstenberg zurück zur Augsburger Puppenkiste zu bringen — indem
-sie QR-Codes im Verstehbahnhof scannen und dabei auf einem LED-Streifen
+sie QR-Codes am Verstehbahnhof scannen und dabei auf einem LED-Streifen
 zusehen, wie Emma Bahnhof für Bahnhof nach Hause rollt.
 
 ## Die Geschichte
@@ -22,7 +22,7 @@ Stationen wieder fit gemacht werden. Am Ende rollt sie in Augsburg ein.
 
 Die Spieler:innen begegnen pro Bahnhof **zwei** QR-Codes:
 
-1. **Aufgaben-QR** — irgendwo im Verstehbahnhof versteckt (am Lok-Bild,
+1. **Aufgaben-QR** — irgendwo am Verstehbahnhof versteckt (am Lok-Bild,
    am Repair-Café-Plakat, am Goldstein, an der Lore). Beim Scannen wird
    die Aufgabe am aktuellen Bahnhof als erledigt markiert und die
    Webseite sagt: "Geh zurück zum Start-QR".

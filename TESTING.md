@@ -1,7 +1,7 @@
 # Testing – Verstehbahnhof-Cache
 
 URLs und Debug-Hilfen zum Testen des Spielflusses. Dieselben URLs landen
-auch auf den gedruckten QR-Codes im Verstehbahnhof.
+auch auf den gedruckten QR-Codes ams Verstehbahnhof.
 
 ## QR-Codes in Scan-Reihenfolge
 
