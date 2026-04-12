@@ -21,6 +21,7 @@
 #include <WiFiClient.h>
 #include <ArduinoJson.h>
 #include <Adafruit_NeoPixel.h>
+#include <time.h>
 
 #include "config.h"
 
@@ -411,7 +412,10 @@ void transitionFlash() {
 
 void connectWifi() {
     Serial.printf("Verbinde mit WLAN %s...\n", WIFI_SSID);
+    WiFi.persistent(false);          // keine Flash-Schreibzugriffe bei jedem Boot
     WiFi.mode(WIFI_STA);
+    WiFi.setAutoReconnect(true);     // ESP8266-Stack reconnectet selbstständig
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // Modem-Sleep aus (verhindert Drop-Outs)
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
     unsigned long start = millis();
@@ -422,6 +426,9 @@ void connectWifi() {
     Serial.println();
     if (WiFi.status() == WL_CONNECTED) {
         Serial.printf("WLAN OK, IP: %s\n", WiFi.localIP().toString().c_str());
+        // NTP im Hintergrund starten (nicht blockierend)
+        configTime("CET-1CEST,M3.5.0,M10.5.0/3", "pool.ntp.org", "time.cloudflare.com");
+        Serial.println("NTP gestartet");
     } else {
         Serial.println("WLAN fehlgeschlagen, reboot in 5s");
         delay(5000);
@@ -502,6 +509,66 @@ void pollApiAndUpdate() {
     }
 }
 
+// -------- Stabilität: WiFi-Watchdog + Nacht-Neustart --------
+
+static unsigned long s_wifiLostAt = 0;  // 0 = verbunden, sonst Zeitstempel des Verlusts
+
+// Prüft alle 15 s den WiFi-Status. Wenn getrennt: sofort reconnect(); wenn
+// länger als 5 Min offline: harter Neustart. Muss zu Beginn jedes loop()-
+// Durchlaufs aufgerufen werden.
+void maintainWifi() {
+    static unsigned long s_lastCheck = 0;
+    unsigned long now = millis();
+    if (now - s_lastCheck < 15000UL) return;
+    s_lastCheck = now;
+
+    if (WiFi.status() == WL_CONNECTED) {
+        if (s_wifiLostAt != 0) {
+            Serial.printf("WiFi wieder verbunden, IP: %s\n",
+                          WiFi.localIP().toString().c_str());
+            s_wifiLostAt = 0;
+        }
+        return;
+    }
+
+    if (s_wifiLostAt == 0) {
+        s_wifiLostAt = now;
+        Serial.println("WiFi getrennt – versuche Reconnect…");
+        WiFi.reconnect();
+    } else if (now - s_wifiLostAt > 5UL * 60UL * 1000UL) {
+        Serial.println("WiFi seit 5 Min weg – Neustart!");
+        delay(200);
+        ESP.restart();
+    }
+}
+
+// Prüft einmal pro Minute ob ein täglicher Neustart fällig ist.
+// Primär: um 3:00 Uhr MEZ/MESZ (via NTP). Fallback: nach 26 h Laufzeit
+// (greift auch ohne NTP-Sync, verhindert Speicherfragmentierung über Zeit).
+void checkNightReset() {
+    static unsigned long s_lastCheck = 0;
+    unsigned long now_ms = millis();
+    if (now_ms - s_lastCheck < 60000UL) return;
+    s_lastCheck = now_ms;
+
+    // Fallback: nach 26 h Laufzeit neu starten
+    if (now_ms > 26UL * 3600UL * 1000UL) {
+        Serial.println("26h-Fallback-Neustart");
+        delay(200);
+        ESP.restart();
+    }
+
+    // NTP-basierter Nacht-Neustart um 3:00 Uhr (MEZ/MESZ)
+    time_t now_t = time(nullptr);
+    struct tm* t = localtime(&now_t);
+    // tm_year ist Jahre seit 1900; > 120 = nach 2020 → NTP bereits synced
+    if (t->tm_year > 120 && t->tm_hour == 3 && t->tm_min == 0) {
+        Serial.println("Nacht-Neustart 3:00 Uhr MEZ");
+        delay(200);
+        ESP.restart();
+    }
+}
+
 // -------- Setup / Loop --------
 
 void setup() {
@@ -527,6 +594,9 @@ void setup() {
 }
 
 void loop() {
+    maintainWifi();
+    checkNightReset();
+
     const unsigned long now = millis();
 
     if (currentStation < 0) {
