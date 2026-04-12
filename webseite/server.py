@@ -239,7 +239,8 @@ def scan_start_qr_impl():
                       finished_at=new_data["finished_at"],
                       duration_sec=_duration_sec(new_data))
         save_state(new_data)
-        return new_data, "advanced"
+        kind = "arrived" if new_station == NUM_STATIONS - 1 else "advanced"
+        return new_data, kind
 
     if data["station"] == NUM_STATIONS - 1:
         data = touch(data)
