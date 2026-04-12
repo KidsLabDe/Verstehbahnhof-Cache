@@ -6,6 +6,18 @@ from flask import Flask, render_template, jsonify, redirect, request
 
 app = Flask(__name__)
 
+
+@app.after_request
+def no_cache(response):
+    # Alle Seiten sind dynamisch und verändern Server-State beim Aufruf.
+    # Ohne diesen Header lädt der Browser (z.B. der QR-Scanner) dieselbe
+    # URL aus dem Cache – scan_start_qr() wird nie aufgerufen und der
+    # Spielstand friert ein.
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 _data_dir = os.environ.get("STATE_DIR", os.path.dirname(__file__))
 os.makedirs(_data_dir, exist_ok=True)
 STATE_FILE = os.path.join(_data_dir, "state.json")
