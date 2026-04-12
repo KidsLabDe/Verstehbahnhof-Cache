@@ -90,10 +90,8 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}
-
-{# --- Fall 1: Spiel wird gerade gestartet --- #}
-{% if kind == "started" %}
+{% macro task_cards(station) %}
+{% if station == 0 %}
 <div class="card">
   <div class="card-label">Augsburger in Fürstenberg</div>
   <h2>Emma fehlt!</h2>
@@ -101,7 +99,6 @@
     Jim Knopf und Lukas der Lokomotivführer wollen zurück nach Augsburg zur Puppenkiste fahren – doch Emma ist verschwunden.
   </p>
 </div>
-
 <div class="card">
   <div class="card-label">Erste Aufgabe</div>
   <h2>Such das Lok-Bild</h2>
@@ -111,11 +108,8 @@
     Komm danach zurück zur Karte!
   </p>
 </div>
-
-{# --- Fall 2: Task erledigt, Bahnhof freigeschaltet --- #}
-{% elif kind == "advanced" %}
+{% elif station == 1 %}
 <div class="card">
-  {% if station == 1 %}
   <div class="card-label">Repair Café</div>
   <h2>Such das Repair Café Plakat</h2>
   <p>
@@ -123,7 +117,9 @@
     Finde das Repair-Café-Plakat im Verstehbahnhof.<br>
     Komm danach zurück zur Karte!
   </p>
-  {% elif station == 2 %}
+</div>
+{% elif station == 2 %}
+<div class="card">
   <div class="card-label">Goldstein</div>
   <h2>Such den Goldstein</h2>
   <p>
@@ -131,7 +127,9 @@
     Vom Stein aus siehst du ein gelbes G – darüber ist der QR-Code.<br>
     Komm danach zurück zur Karte!
   </p>
-  {% elif station == 3 %}
+</div>
+{% elif station == 3 %}
+<div class="card">
   <div class="card-label">Lore</div>
   <h2>Such die Lore</h2>
   <p>
@@ -139,30 +137,17 @@
     Dort ist auch die finale Cache-Box.<br>
     Komm danach zurück zur Karte!
   </p>
-  {% endif %}
 </div>
+{% endif %}
+{% endmacro %}
 
-{# --- Fall 3: Zu früh zurück --- #}
-{% elif kind == "pending" %}
-<div class="card">
-  <div class="card-label">Zu früh!</div>
-  <h2>Erst die Aufgabe lösen</h2>
-  <p>
-    {% if station == 0 %}Such das <strong>Lok-Bild</strong> im Verstehbahnhof.
-    {% elif station == 1 %}Such das <strong>Repair-Café-Plakat</strong>.
-    {% elif station == 2 %}Such den <strong>Goldstein</strong>.
-    {% elif station == 3 %}Such die <strong>Lore</strong>.
-    {% endif %}<br>
-    Scanne dort den QR-Code und komm dann hierher zurück.
-  </p>
-</div>
+{% block content %}
 
-{# --- Fall 4: Ziel erreicht --- #}
-{% else %}
+{% if kind == "arrived" %}
+{# --- Finale --- #}
 <div class="finale-banner">
   &#x1F682; &nbsp; Emma ist in Augsburg angekommen &nbsp; &#x1F682;
 </div>
-
 <div class="card">
   <div class="card-label">Geschafft!</div>
   <h2>Logbuch</h2>
@@ -184,7 +169,6 @@
     <a href="/logbook" style="color:var(--muted);text-decoration:underline;">Alle Einträge ansehen</a>
   </p>
 </div>
-
 <div class="card">
   <div class="card-label">Cache-Fund</div>
   <h2>Die finale Box</h2>
@@ -193,6 +177,17 @@
     <a href="https://geocaching.com" style="color:var(--accent);">geocaching.com</a> loggen!
   </p>
 </div>
+
+{% else %}
+{# --- started / advanced / pending: Aufgabe anzeigen --- #}
+{{ task_cards(station if kind == "advanced" else 0 if kind == "started" else station) }}
+
+{% if kind == "pending" %}
+<div class="warning-card">
+  <div class="card-label">Zu früh zurück!</div>
+  <p>Du musst erst den QR-Code an der aktuellen Station scannen.</p>
+</div>
+{% endif %}
 
 {% endif %}
 
