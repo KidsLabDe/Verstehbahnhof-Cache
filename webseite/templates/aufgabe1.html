@@ -7,20 +7,16 @@
 {% if already_done %}
 <div class="warning-card">
   <div class="card-label">Zu früh zurück!</div>
-  <p>Du hast diesen QR-Code schon gescannt. Geh zurück zur Karte und scanne den Start-QR.</p>
+  <p>Geh zur Karte und scanne den Start-QR.</p>
 </div>
 {% endif %}
 
 <div class="card">
-  <p>Du hast die Lok gefunden – aber Emma ist kaputt und muss repariert werden!</p>
-</div>
-
-<div class="card">
-  <div class="card-label">Nächster Schritt</div>
-  <h2>Geh zurück zur Karte</h2>
+  <div class="card-label">Lok gefunden</div>
+  <h2>Emma ist kaputt!</h2>
   <p>
-    Scanne den Start-QR an der Karte.<br>
-    Dann wird der nächste Bahnhof freigeschaltet.
+    Sie muss repariert werden.<br>
+    Geh zurück zur Karte und scanne den Start-QR.
   </p>
 </div>
 {% endblock %}

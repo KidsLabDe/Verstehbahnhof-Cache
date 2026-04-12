@@ -95,7 +95,7 @@
 {# --- Fall 1: Spiel wird gerade gestartet --- #}
 {% if kind == "started" %}
 <div class="card">
-  <div class="card-label">Notruf aus Fürstenberg</div>
+  <div class="card-label">Augsburger in Fürstenberg</div>
   <h2>Emma fehlt!</h2>
   <p>
     Jim Knopf und Lukas der Lokomotivführer wollen zurück nach Augsburg zur Puppenkiste fahren – doch Emma ist verschwunden.
@@ -112,123 +112,76 @@
   </p>
 </div>
 
-{# --- Fall 2: Task erledigt, Bahnhof wird freigeschaltet --- #}
+{# --- Fall 2: Task erledigt, Bahnhof freigeschaltet --- #}
 {% elif kind == "advanced" %}
 <div class="card">
-  <div class="card-label">Bahnhof freigeschaltet</div>
-  <h2>Emma rollt weiter!</h2>
-  <p>
-    Du hast Jim geholfen – schau zu Emma auf die Strecke: Der neue Bahnhof
-    wird gerade <em>geöffnet</em>. Er blinkt, fadet aus und wird grün.
-    Dann setzt sich Emma wieder in Bewegung.
-  </p>
   {% if station == 1 %}
+  <div class="card-label">Repair Café</div>
+  <h2>Such das Repair Café Plakat</h2>
   <p>
-    Nächster Halt: <strong>Berlin</strong>. Emma ist kaputt – sie muss repariert werden.
+    Emma ist kaputt – sie muss repariert werden.<br>
+    Finde das Repair-Café-Plakat im Verstehbahnhof.<br>
+    Komm danach zurück zur Karte!
   </p>
   {% elif station == 2 %}
+  <div class="card-label">Goldstein</div>
+  <h2>Such den Goldstein</h2>
   <p>
-    Nächster Halt: <strong>Leipzig</strong>. Die Lok funktioniert!
-    Jetzt muss der Schatz eingesammelt werden – finde den goldenen Stein!
+    Finde den goldenen Stein auf dem Gelände.<br>
+    Vom Stein aus siehst du ein gelbes G – darüber ist der QR-Code.<br>
+    Komm danach zurück zur Karte!
   </p>
   {% elif station == 3 %}
+  <div class="card-label">Lore</div>
+  <h2>Such die Lore</h2>
   <p>
-    Nächster Halt: <strong>Nürnberg</strong>. Wie transportieren wir den Schatz?
-    Finde die Loren in der Umgebung – dort ist auch die finale Box.
+    Finde die Loren auf dem Gelände.<br>
+    Dort ist auch die finale Cache-Box.<br>
+    Komm danach zurück zur Karte!
   </p>
   {% endif %}
 </div>
 
-<div class="card">
-  <div class="card-label">Nächste Aufgabe</div>
-  <h2>Such den nächsten QR-Code</h2>
-  <div class="hint-box">
-    <div class="hint-label">Deine Aufgabe</div>
-    {% if station == 1 %}
-      Finde das Repair-Café-Plakat im Verstehbahnhof.
-    {% elif station == 2 %}
-      Suche den goldenen Stein auf dem Gelände.<br>
-      Vom Stein aus siehst du ein gelbes G – über dem ist der nächste QR-Code.
-    {% elif station == 3 %}
-      Finde die Loren auf dem Gelände.<br>
-      Dort ist auch die finale Cache-Box versteckt.
-    {% endif %}
-    <br>
-    Scanne dort den QR-Code und komm wieder hierher zurück.
-  </div>
-</div>
-
-{# --- Fall 3: Task noch offen, zu früh zurück --- #}
+{# --- Fall 3: Zu früh zurück --- #}
 {% elif kind == "pending" %}
 <div class="card">
-  <div class="card-label">Hmmm …</div>
-  <h2>Du bist zu früh zurück!</h2>
+  <div class="card-label">Zu früh!</div>
+  <h2>Erst die Aufgabe lösen</h2>
   <p>
-    Emma wartet noch. Du musst erst die aktuelle Aufgabe lösen, bevor der
-    nächste Bahnhof geöffnet werden kann.
+    {% if station == 0 %}Such das <strong>Lok-Bild</strong> im Verstehbahnhof.
+    {% elif station == 1 %}Such das <strong>Repair-Café-Plakat</strong>.
+    {% elif station == 2 %}Such den <strong>Goldstein</strong>.
+    {% elif station == 3 %}Such die <strong>Lore</strong>.
+    {% endif %}<br>
+    Scanne dort den QR-Code und komm dann hierher zurück.
   </p>
-  {% if station == 0 %}
-  <p>Suche das <strong>Lok-Bild</strong> im Verstehbahnhof.</p>
-  {% elif station == 1 %}
-  <p>Suche das <strong>Repair-Café-Plakat</strong>.</p>
-  {% elif station == 2 %}
-  <p>Suche den <strong>Goldstein</strong>.</p>
-  {% elif station == 3 %}
-  <p>Suche die <strong>Lore</strong>.</p>
-  {% endif %}
-  <div class="hint-box">
-    <div class="hint-label">Hinweis</div>
-    Scanne erst den QR-Code an der aktuellen Aufgabe.<br>
-    Danach kommst du hier wieder vorbei.
-  </div>
 </div>
 
 {# --- Fall 4: Ziel erreicht --- #}
 {% else %}
 <div class="finale-banner">
-  &#x1F386; &nbsp; Emma ist in Augsburg angekommen &nbsp; &#x1F386;
-</div>
-
-<div class="card" style="text-align:center;">
-  <div class="finale-title">&#x1F682; Glückwunsch! &#x1F682;</div>
-  <div class="card-label">Jim Knopf sagt</div>
-  <p style="margin-top:0.75rem;">
-    <em>
-      „Du hast es geschafft! Lok-Bild, Repair Café, Goldstein, Lore –
-      alles da! Emma und ich rollen endlich wieder nach Hause zur
-      Augsburger Puppenkiste. Das vergessen wir dir nie!"
-    </em>
-  </p>
-  <p style="margin-top:0.75rem;">
-    Schau zur Strecke: Emma ist in Augsburg angekommen, alle Bahnhöfe
-    leuchten grün &#x2014; die ganze Reise in einem Bild.
-  </p>
+  &#x1F682; &nbsp; Emma ist in Augsburg angekommen &nbsp; &#x1F682;
 </div>
 
 <div class="card">
-  <div class="card-label">Logbuch</div>
-  <h2>Hinterlass eine Nachricht</h2>
-  <p>
-    Jim Knopf würde gerne wissen, wer ihm geholfen hat. Trag dich mit
-    Namen und einem kleinen Gruß ins Logbuch ein.
-  </p>
+  <div class="card-label">Geschafft!</div>
+  <h2>Logbuch</h2>
+  <p>Trag dich ein – Jim Knopf würde sich freuen.</p>
   <form class="logbook-form" action="/logbook" method="post">
     <div>
-      <label for="lb-name">Dein Name</label>
+      <label for="lb-name">Name</label>
       <input id="lb-name" name="name" type="text" maxlength="100" required
              placeholder="z.B. Mara, 9 Jahre" />
     </div>
     <div>
-      <label for="lb-comment">Dein Gruß</label>
+      <label for="lb-comment">Gruß</label>
       <textarea id="lb-comment" name="comment" maxlength="2000" required
                 placeholder="Gute Reise, Emma!"></textarea>
     </div>
-    <button type="submit">Ins Logbuch eintragen</button>
+    <button type="submit">Eintragen</button>
   </form>
   <p style="font-size:0.8rem;color:var(--muted);margin-top:0.75rem;">
-    <a href="/logbook" style="color:var(--muted);text-decoration:underline;">
-      Alle bisherigen Einträge im Logbuch ansehen
-    </a>
+    <a href="/logbook" style="color:var(--muted);text-decoration:underline;">Alle Einträge ansehen</a>
   </p>
 </div>
 
@@ -236,43 +189,18 @@
   <div class="card-label">Cache-Fund</div>
   <h2>Die finale Box</h2>
   <p>
-    Direkt hier bei Emma ist die richtige Cache-Box versteckt.
-    Trag dich auch dort im Logbuch ein und vergiss nicht, den Fund
-    online auf <a href="https://geocaching.com" style="color:var(--accent);">geocaching.com</a>
-    einzutragen!
-  </p>
-  <div class="hint-box">
-    <div class="hint-label">TFTC</div>
-    Thanks for this cache &nbsp;&#x2014;&nbsp;
-    Danke fürs Mitspielen!
-  </div>
-</div>
-
-<div class="card" style="text-align:center;">
-  <p style="font-size:0.82rem;color:var(--muted);">
-    Cache gelegt vom Verstehbahnhof Fürstenberg (Halle).<br>
-    Lok &#x2192; Repair Café &#x2192; Goldstein &#x2192; Lore &#x2192; Augsburg
+    Hier ist die Cache-Box versteckt. Eintragen und auf
+    <a href="https://geocaching.com" style="color:var(--accent);">geocaching.com</a> loggen!
   </p>
 </div>
 
 {% endif %}
 
-{# --- Reset-Option (immer sichtbar, aber nur auf Startseite und Finale
-      prominenter platzieren) --- #}
 {% if kind == "started" or kind == "arrived" %}
 <div class="card" style="text-align:center;">
-  <p style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;">
-    {% if kind == "started" %}
-      Spielt gerade jemand anders und ihr wollt neu anfangen?
-    {% else %}
-      Nächste Gruppe dran?
-    {% endif %}
-  </p>
-  <p>
-    <a href="/reset" style="color:var(--muted);text-decoration:underline;font-size:0.8rem;">
-      Spielstand zurücksetzen
-    </a>
-  </p>
+  <a href="/reset" style="color:var(--muted);text-decoration:underline;font-size:0.8rem;">
+    Spielstand zurücksetzen
+  </a>
 </div>
 {% endif %}
 
