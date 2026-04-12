@@ -55,31 +55,48 @@ Am Plakat des Repaircafés ist der nächste QR-Code.
 
 ---
 
-## wieder An der Karte
+## Wieder an der Karte
 
-- lock funktioniert, jetzt muss der schatz eingesammelt werden.
-- finde den goldenen stein
-- vom goldenen stein aus sieht man ein gelbes G, über dem ist der nächste qr-code
+**Inhalt:**
+- Die Lok funktioniert, jetzt muss der Schatz eingesammelt werden.
+- Finde den goldenen Stein!
+- Vom goldenen Stein aus sieht man ein gelbes G – über dem ist der nächste QR-Code.
 
+---
 
 ## Station 3: Goldstein
-qr: https://verstehbahnhof.kidslab.de/aufgabe_g0ldst3in_m7x
 
-- gefunden
-- zurück zur karte
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe_g0ldst3in_m7x
 
-## an der karte
+**Inhalt:**
+- Gefunden!
+- Zurück zur Karte.
 
-- wie transportieren wir den schatz
-- finde die loren hier in der umgebung
+---
 
-## station 4: loren
-hier ist der final, mit der cache box
-ab hier optional für das story ende
-qr-code: https://verstehbahnhof.kidslab.de/aufgabe_l0r3nf4hrt_b3q
+## Wieder an der Karte
 
-- gefunden, zurück zur karte um endlich bei der augsburger puppenkiste anzukommen
+**Inhalt:**
+- Wie transportieren wir den Schatz?
+- Finde die Loren hier in der Umgebung!
+- An den Loren findest du auch die finale Box
 
-## karte
-- geschafft
-- log möglich
+---
+
+## Station 4: Loren (Finale)
+
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe_l0r3nf4hrt_b3q
+
+Hier ist das Finale mit der Cache-Box.
+Ab hier optional für das Story-Ende.
+
+**Inhalt:**
+- Gefunden! Zurück zur Karte, um endlich bei der Augsburger Puppenkiste anzukommen.
+
+---
+
+## Karte (Ende)
+
+**Inhalt:**
+- Geschafft!
+- Log möglich.
