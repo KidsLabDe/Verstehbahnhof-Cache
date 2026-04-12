@@ -7,7 +7,7 @@ Der QR-Code am Start gibt immer den aktuellen Stand und Hinweis zur nächsten St
 
 ---
 
-## Station 1: Start
+## Start
 
 **URL:** https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
 
@@ -19,7 +19,7 @@ Der QR-Code am Start gibt immer den aktuellen Stand und Hinweis zur nächsten St
 
 ---
 
-## Station 2: Bild der Lok
+## Station 1: Bild der Lok
 
 **URL:** https://verstehbahnhof.kidslab.de/aufgabe1
 
@@ -32,7 +32,7 @@ An dem Bild der Lok ist der nächste QR-Code versteckt.
 
 ---
 
-## Station 3: Zurück am Ausgangspunkt/Karte
+## Zurück am Ausgangspunkt/Karte
 
 **URL:** https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
 
@@ -42,7 +42,7 @@ An dem Bild der Lok ist der nächste QR-Code versteckt.
 
 ---
 
-## Station 4: Repaircafé
+## Station 2: Repaircafé
 
 **URL:** https://verstehbahnhof.kidslab.de/aufgabe_w3rkst4tt_k9p
 
@@ -55,6 +55,31 @@ Am Plakat des Repaircafés ist der nächste QR-Code.
 
 ---
 
-## Station 5: wieder An der Karte
+## wieder An der Karte
 
-*(Hier fehlt noch der weitere Ablauf)*
+- lock funktioniert, jetzt muss der schatz eingesammelt werden.
+- finde den goldenen stein
+- vom goldenen stein aus sieht man ein gelbes G, über dem ist der nächste qr-code
+
+
+## Station 3: Goldstein
+qr: https://verstehbahnhof.kidslab.de/aufgabe_g0ldst3in_m7x
+
+- gefunden
+- zurück zur karte
+
+## an der karte
+
+- wie transportieren wir den schatz
+- finde die loren hier in der umgebung
+
+## station 4: loren
+hier ist der final, mit der cache box
+ab hier optional für das story ende
+qr-code: https://verstehbahnhof.kidslab.de/aufgabe_l0r3nf4hrt_b3q
+
+- gefunden, zurück zur karte um endlich bei der augsburger puppenkiste anzukommen
+
+## karte
+- geschafft
+- log möglich
