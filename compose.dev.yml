@@ -1,0 +1,17 @@
+services:
+  webseite:
+    build: ./webseite
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./webseite:/app          # live reload bei Änderungen
+      - state_dev:/app/state
+    environment:
+      - STATE_DIR=/app/state
+      - FLASK_DEBUG=1
+      - INACTIVITY_TIMEOUT_MIN=15
+      - ARRIVED_TIMEOUT_MIN=5
+    command: python server.py
+
+volumes:
+  state_dev:
