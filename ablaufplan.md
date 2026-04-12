@@ -1,34 +1,60 @@
-durch geocache listing oder aus zufall kommt man zum startpunkt
+# Ablaufplan Geocache Verstehbahnhof
 
-am startpunkt ist eine karte, mit leds eingebaut, die den fotschritt anzeigt.
-der qr code am start gibt immer den aktuellen stand und hinweis zur nächsten station
+Durch Geocache-Listing oder aus Zufall kommt man zum Startpunkt.
 
-hier ist der qr-code auf: https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
-inhalt:
-- Jim Knopf und Lukas der Lokomotivführer sind am Verstehbahnhof gestrandet.  
-Lukas Lokomotive Emma ist verschwunden - ohne sie kommt er nicht zurück nach Augsburg.
-- Deine Aufgabe
--  Finde die Lok
--     Irgendwo am Verstehbahnhof ist ein großes Bild einer Lokomotive zu sehen.
-    Dort wartet der erste Hinweis.
+Am Startpunkt ist eine Karte mit LEDs eingebaut, die den Fortschritt anzeigt.
+Der QR-Code am Start gibt immer den aktuellen Stand und Hinweis zur nächsten Station.
 
+---
 
-an dem bild der lock ist der nächste qr-code versteckt: https://verstehbahnhof.kidslab.de/aufgabe1
-inhalt:
+## Station 1: Start
+
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
+
+**Inhalt:**
+- Jim Knopf und Lukas der Lokomotivführer sind am Verstehbahnhof gestrandet.
+- Lukas Lokomotive Emma ist verschwunden – ohne sie kommt er nicht zurück nach Augsburg.
+- **Deine Aufgabe:** Finde die Lok!
+- Irgendwo am Verstehbahnhof ist ein großes Bild einer Lokomotive zu sehen. Dort wartet der erste Hinweis.
+
+---
+
+## Station 2: Bild der Lok
+
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe1
+
+An dem Bild der Lok ist der nächste QR-Code versteckt.
+
+**Inhalt:**
 - Du hast die Lok gefunden – aber Emma ist kaputt und muss repariert werden!
-- Geh zurück zum Start-QR
-- Geh zurück zur Karte und scanne nochmal den Start-QR.<br>
-    Dann wird der nächste Bahnhof freigeschaltet.
+- Geh zurück zur Karte und scanne nochmal den Start-QR.
+- Dann wird der nächste Bahnhof freigeschaltet.
 
-wieder am ausgangspunkt: https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
-inhalt:
-- die lock ist kaputt
-- sie muss repariert werden, suche das repaircafe
+---
 
-am plakat des repaircafes ist der nächste qr-code: /aufgabe_w3rkst4tt_k9p
-inhalt:
+## Station 3: Zurück am Ausgangspunkt/Karte
+
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p
+
+**Inhalt:**
+- Die Lok ist kaputt.
+- Sie muss repariert werden – suche das Repaircafé!
+
+---
+
+## Station 4: Repaircafé
+
+**URL:** https://verstehbahnhof.kidslab.de/aufgabe_w3rkst4tt_k9p
+
+Am Plakat des Repaircafés ist der nächste QR-Code.
+
+**Inhalt:**
 - Emma ist repariert!
-- Geh zurück zur Karte und scanne nochmal den Start-QR.<br>
-    Dann wird der nächste Bahnhof freigeschaltet.
+- Geh zurück zur Karte und scanne nochmal den Start-QR.
+- Dann wird der nächste Bahnhof freigeschaltet.
 
-an der kart
+---
+
+## Station 5: wieder An der Karte
+
+*(Hier fehlt noch der weitere Ablauf)*
