@@ -8,3 +8,4 @@ build/
 .pioenvs/
 .piolibdeps/
 *.log
+old/
