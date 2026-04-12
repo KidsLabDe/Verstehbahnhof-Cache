@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Verstehbahnhof{% endblock %}</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -24,7 +22,7 @@
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -171,5 +169,14 @@
   <footer>
     GeoCache &nbsp;&#x25A0;&nbsp; VERSTEHBAHNHOF &nbsp;&#x25A0;&nbsp; <a href="https://www.geocaching.com/geocache/GCBN2XH" target="_blank" style="color: var(--muted); text-decoration: none;">GCBN2XH</a> &nbsp;&#x25A0;&nbsp; <a href="/reset" style="color: var(--muted); text-decoration: underline;">Spielstand zurücksetzen</a>
   </footer>
+  <script>
+    // iOS Safari und Android Chrome liefern Seiten aus dem BFCache
+    // (Back/Forward Cache) aus, ohne einen HTTP-Request zu machen –
+    // no-store-Header werden dabei ignoriert. Das führt dazu, dass ein
+    // erneuter QR-Scan die veraltete Seite zeigt statt den neuen Spielstand.
+    window.addEventListener('pageshow', function(e) {
+      if (e.persisted) window.location.reload();
+    });
+  </script>
 </body>
 </html>
