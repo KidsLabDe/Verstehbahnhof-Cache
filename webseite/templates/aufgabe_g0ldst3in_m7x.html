@@ -4,12 +4,6 @@
 {% block header_title %}Station 3 / 4{% endblock %}
 
 {% block content %}
-{% if already_done %}
-<div class="warning-card">
-  <div class="card-label">Schon gescannt.</div>
-  <p>Geh zur Karte und scanne den Start-QR.</p>
-</div>
-{% endif %}
 
 <div class="card">
   <div class="card-label">Goldstein gefunden</div>
@@ -18,4 +12,10 @@
     Geh zurück zur Karte und scanne den Start-QR.
   </p>
 </div>
+{% if already_done %}
+<div class="warning-card">
+  <div class="card-label">Schon gescannt.</div>
+  <p>Geh zur Karte und scanne den Start-QR.</p>
+</div>
+{% endif %}
 {% endblock %}

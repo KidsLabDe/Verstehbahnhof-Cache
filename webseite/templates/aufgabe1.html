@@ -4,13 +4,6 @@
 {% block header_title %}Station 1 / 4{% endblock %}
 
 {% block content %}
-{% if already_done %}
-<div class="warning-card">
-  <div class="card-label">Schon gescannt.</div>
-  <p>Geh zur Karte und scanne den Start-QR.</p>
-</div>
-{% endif %}
-
 <div class="card">
   <div class="card-label">Grafitti</div>
   <h2>Lok Gefunden!</h2>
@@ -19,4 +12,10 @@
     Geh zurück zur Karte und scanne den Start-QR-Code um herauszufinden was fehlt.
   </p>
 </div>
+{% if already_done %}
+<div class="warning-card">
+  <div class="card-label">Schon gescannt.</div>
+  <p>Geh zur Karte und scanne den Start-QR.</p>
+</div>
+{% endif %}
 {% endblock %}
