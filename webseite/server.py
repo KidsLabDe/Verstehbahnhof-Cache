@@ -34,7 +34,7 @@ def _int_env(name, default):
         return default
 
 INACTIVITY_TIMEOUT = timedelta(minutes=_int_env("INACTIVITY_TIMEOUT_MIN", 15))
-ARRIVED_TIMEOUT    = timedelta(minutes=_int_env("ARRIVED_TIMEOUT_MIN", 15))
+ARRIVED_TIMEOUT    = timedelta(minutes=_int_env("ARRIVED_TIMEOUT_MIN", 10))
 
 # -------- Logging --------
 #
