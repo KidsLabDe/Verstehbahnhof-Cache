@@ -1,4 +1,4 @@
-// Verstehbahnhof-Cache – Wemos D1 Mini Lite Firmware
+// Verstehbahnhof-Cache - Wemos D1 Mini Lite Firmware
 //
 // Pollt eine API (wird parallel von MatzE gebaut) nach dem aktuellen
 // Bahnhof und zeigt Emmas Reise von Fürstenberg nach Augsburg auf
@@ -72,7 +72,7 @@ static const uint16_t NUM_STATIONS =
 static_assert(sizeof(STATION_LEDS) / sizeof(STATION_LEDS[0]) == NUM_STATIONS,
     "STATION_LEDS in config.h muss genauso viele Eintraege haben wie STATION_NAMES in main.cpp");
 
-// LED-Position eines Bahnhofs – liest aus STATION_LEDS[] (config.h).
+// LED-Position eines Bahnhofs - liest aus STATION_LEDS[] (config.h).
 uint16_t stationLed(int idx) {
     if (idx < 0) return STATION_LEDS[0];
     if (idx >= (int)NUM_STATIONS) return STATION_LEDS[NUM_STATIONS - 1];
@@ -230,7 +230,7 @@ void tickTrainAnimation() {
     const int maxPos = ledB - 1;
 
     // Wenn die Bahnhöfe direkt nebeneinander liegen, gibt es keinen Platz
-    // für den Zug dazwischen – dann lieber gar nichts malen.
+    // für den Zug dazwischen - dann lieber gar nichts malen.
     if (maxPos < minPos) {
         drawBaseline();
         strip.show();
@@ -252,7 +252,7 @@ void tickTrainAnimation() {
 
     // Am Wendepunkt vor dem nächsten roten Bahnhof: API fragen, ob es
     // inzwischen weitergeht. Das ist der einzige Zeitpunkt, an dem die
-    // Firmware pollt – kein Zeittakt.
+    // Firmware pollt - kein Zeittakt.
     if (reachedNext) {
         pollApiAndUpdate();
     }
@@ -391,7 +391,7 @@ void tickAttractAnimation() {
 // Wird einmalig gerufen, wenn state von -1 auf >= 0 wechselt (Initial-QR
 // wurde gescannt). Kurzer heller Flash über den ganzen Streifen.
 void transitionFlash() {
-    Serial.println("TRANSITION: Initial-QR erkannt – Flash!");
+    Serial.println("TRANSITION: Initial-QR erkannt - Flash!");
     // 6 Frames à ~50 ms, von hell nach dunkel
     const uint8_t steps[6] = { 255, 220, 180, 130, 80, 30 };
     for (int s = 0; s < 6; s++) {
@@ -440,7 +440,7 @@ void connectWifi() {
 }
 
 // Holt den State von MatzEs API (GET API_URL → {"state": N, ...}).
-// Plain HTTP – Traefik liefert /state zusätzlich über http aus, damit
+// Plain HTTP - Traefik liefert /state zusätzlich über http aus, damit
 // wir uns BearSSL auf dem ESP8266 sparen. Gibt -1 bei Fehler zurück.
 int fetchCurrentStation() {
     if (WiFi.status() != WL_CONNECTED) return -1;
@@ -536,10 +536,10 @@ void maintainWifi() {
 
     if (s_wifiLostAt == 0) {
         s_wifiLostAt = now;
-        Serial.println("WiFi getrennt – versuche Reconnect…");
+        Serial.println("WiFi getrennt - versuche Reconnect…");
         WiFi.reconnect();
     } else if (now - s_wifiLostAt > 5UL * 60UL * 1000UL) {
-        Serial.println("WiFi seit 5 Min weg – Neustart!");
+        Serial.println("WiFi seit 5 Min weg - Neustart!");
         delay(200);
         ESP.restart();
     }
@@ -585,7 +585,7 @@ void setup() {
 
     strip.begin();
     strip.setBrightness(NEOPIXEL_BRIGHTNESS);
-    // Start schwarz – Attract zeichnet im ersten Frame
+    // Start schwarz - Attract zeichnet im ersten Frame
     for (uint16_t i = 0; i < NEOPIXEL_COUNT; i++) strip.setPixelColor(i, 0);
     strip.show();
 

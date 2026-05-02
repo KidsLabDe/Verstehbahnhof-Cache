@@ -1,4 +1,4 @@
-# Testing – Verstehbahnhof-Cache
+# Testing - Verstehbahnhof-Cache
 
 URLs und Debug-Hilfen zum Testen des Spielflusses. Dieselben URLs landen
 auch auf den gedruckten QR-Codes ams Verstehbahnhof.
@@ -8,7 +8,7 @@ auch auf den gedruckten QR-Codes ams Verstehbahnhof.
 | Schritt | URL | Effekt im Server | Effekt auf der Firmware |
 |---|---|---|---|
 | 1. Initial / Start-QR | <http://verstehbahnhof.kidslab.de/aufgabe_st4rt_v9p> | Je nach Zustand: Spielstart / Bahnhof öffnen / "zu früh" / Finale | idle→Fürstenberg: Transition-Flash, dann Pendel 0↔1. Bahnhof-Öffnen: Öffnungs-Animation (rot→fade→grün), dann Pendel N↔N+1 |
-| 2. Lok / Schloss-QR | <http://verstehbahnhof.kidslab.de/aufgabe1> | `task_done=true` an Fürstenberg | keine direkte Änderung – wartet auf den nächsten Start-QR-Scan |
+| 2. Lok / Schloss-QR | <http://verstehbahnhof.kidslab.de/aufgabe1> | `task_done=true` an Fürstenberg | keine direkte Änderung - wartet auf den nächsten Start-QR-Scan |
 | 3. Repair-Café-QR | <http://verstehbahnhof.kidslab.de/aufgabe_w3rkst4tt_k9p> | `task_done=true` an Berlin. Wenn der Spieler noch gar nicht gestartet hat: freundlicher Redirect auf reparaturbahnhof.de | keine direkte Änderung |
 | 4. Goldstein-QR | <http://verstehbahnhof.kidslab.de/aufgabe_g0ldst3in_m7x> | `task_done=true` an Leipzig | keine direkte Änderung |
 | 5. Lore-QR | <http://verstehbahnhof.kidslab.de/aufgabe_l0r3nf4hrt_b3q> | `task_done=true` an Nürnberg | keine direkte Änderung |
@@ -20,7 +20,7 @@ viermal zum Freischalten der nächsten Bahnhöfe.
 
 | URL | Zweck |
 |---|---|
-| <http://verstehbahnhof.kidslab.de/state> | JSON `{station, task_done, station_name, last_activity}` – genau das, was die Firmware alle 10 s im Idle bzw. am Pendel-Wendepunkt pollt. Traefik serviert diesen Pfad plain HTTP (kein Redirect), damit der ESP8266 sich keinen TLS-Handshake zumuten muss. |
+| <http://verstehbahnhof.kidslab.de/state> | JSON `{station, task_done, station_name, last_activity}` - genau das, was die Firmware alle 10 s im Idle bzw. am Pendel-Wendepunkt pollt. Traefik serviert diesen Pfad plain HTTP (kein Redirect), damit der ESP8266 sich keinen TLS-Handshake zumuten muss. |
 | <https://verstehbahnhof.kidslab.de/> | Story-Intro (`index.html`). Touch nur der `last_activity`, kein State-Wechsel. |
 
 ## Typischer Test-Flow mit curl
@@ -109,6 +109,6 @@ Erwartete Log-Zeilen:
 - `WLAN OK, IP: 192.168.x.x`
 - `API: check…` bei jedem Poll
 - `Bahnhof: 2 (Goldstein (Leipzig))` beim State-Wechsel
-- `TRANSITION: Initial-QR erkannt – Flash!` beim Spielstart
+- `TRANSITION: Initial-QR erkannt - Flash!` beim Spielstart
 - `Augsburg erreicht!` beim Finale
 - `Idle (Server-Timeout)` wenn der Server auf `station=-1` zurückfällt

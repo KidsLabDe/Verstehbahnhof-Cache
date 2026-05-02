@@ -1,4 +1,4 @@
-# Firmware – Verstehbahnhof-Cache
+# Firmware - Verstehbahnhof-Cache
 
 Firmware für den **Wemos D1 Mini** (ESP8266), der den NeoPixel-Streifen
 mit Emmas Reise von Fürstenberg nach Augsburg ansteuert.

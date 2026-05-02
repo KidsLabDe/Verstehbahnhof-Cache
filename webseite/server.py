@@ -11,7 +11,7 @@ app = Flask(__name__)
 def no_cache(response):
     # Alle Seiten sind dynamisch und verändern Server-State beim Aufruf.
     # Ohne diesen Header lädt der Browser (z.B. der QR-Scanner) dieselbe
-    # URL aus dem Cache – scan_start_qr() wird nie aufgerufen und der
+    # URL aus dem Cache - scan_start_qr() wird nie aufgerufen und der
     # Spielstand friert ein.
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
@@ -106,7 +106,7 @@ def load_state():
     # Migration vom alten Schema {"state": N}: wenn nur das alte
     # "state"-Feld vorliegt, wird der Spielstand komplett zurück-
     # gesetzt. Das alte state=0 war "Spiel läuft, aber nichts
-    # gescannt" – im neuen Schema nicht 1:1 mappbar, daher lieber
+    # gescannt" - im neuen Schema nicht 1:1 mappbar, daher lieber
     # sauber neu starten, damit niemand in einem "zu früh zurück"-
     # Zombie-Zustand hängen bleibt.
     if "station" not in data:

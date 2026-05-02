@@ -13,7 +13,7 @@ Der QR-Code am Start gibt immer den aktuellen Stand und Hinweis zur nächsten St
 
 **Inhalt:**
 - Jim Knopf und Lukas der Lokomotivführer sind am Verstehbahnhof gestrandet.
-- Lukas Lokomotive Emma ist verschwunden – ohne sie kommt er nicht zurück nach Augsburg.
+- Lukas Lokomotive Emma ist verschwunden - ohne sie kommt er nicht zurück nach Augsburg.
 - **Deine Aufgabe:** Finde die Lok!
 - Irgendwo am Verstehbahnhof ist ein großes Bild einer Lokomotive zu sehen. Dort wartet der erste Hinweis.
 
@@ -26,7 +26,7 @@ Der QR-Code am Start gibt immer den aktuellen Stand und Hinweis zur nächsten St
 An dem Bild der Lok ist der nächste QR-Code versteckt.
 
 **Inhalt:**
-- Du hast die Lok gefunden – aber Emma ist kaputt und muss repariert werden!
+- Du hast die Lok gefunden - aber Emma ist kaputt und muss repariert werden!
 - Geh zurück zur Karte und scanne nochmal den Start-QR.
 - Dann wird der nächste Bahnhof freigeschaltet.
 
@@ -38,7 +38,7 @@ An dem Bild der Lok ist der nächste QR-Code versteckt.
 
 **Inhalt:**
 - Die Lok ist kaputt.
-- Sie muss repariert werden – suche das Repaircafé!
+- Sie muss repariert werden - suche das Repaircafé!
 
 ---
 
@@ -60,7 +60,7 @@ Am Plakat des Repaircafés ist der nächste QR-Code.
 **Inhalt:**
 - Die Lok funktioniert, jetzt muss der Schatz eingesammelt werden.
 - Finde den goldenen Stein!
-- Vom goldenen Stein aus sieht man ein gelbes G – über dem ist der nächste QR-Code.
+- Vom goldenen Stein aus sieht man ein gelbes G - über dem ist der nächste QR-Code.
 
 ---
 

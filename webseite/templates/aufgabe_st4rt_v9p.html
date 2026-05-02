@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block title %}
-{%- if kind == "started" -%}Start – Emmas Reise beginnt
+{%- if kind == "started" -%}Start - Emmas Reise beginnt
 {%- elif kind == "advanced" -%}Emma rollt weiter
-{%- elif kind == "arrived" -%}Finale – Augsburg!
+{%- elif kind == "arrived" -%}Finale - Augsburg!
 {%- else -%}Noch nicht so weit
 {%- endif -%}
 {% endblock %}
 
 {% block header_title %}
 {%- if kind == "started" -%}Station 0 / 4
-{%- elif kind == "arrived" -%}Station 4 / 4 – Finale!
+{%- elif kind == "arrived" -%}Station 4 / 4 - Finale!
 {%- else -%}Station {{ station }} / 4
 {%- endif -%}
 {% endblock %}
@@ -96,7 +96,7 @@
   <div class="card-label">Augsburger in Fürstenberg</div>
   <h2>Emma fehlt!</h2>
   <p>
-    Jim Knopf und Lukas der Lokomotivführer wollen zurück nach Augsburg zur Puppenkiste fahren – doch Emma ist verschwunden.
+    Jim Knopf und Lukas der Lokomotivführer wollen zurück nach Augsburg zur Puppenkiste fahren - doch Emma ist verschwunden.
   </p>
 </div>
 <div class="card">
@@ -138,16 +138,12 @@
 {% elif station == 3 %}
 <div class="card">
   <div class="card-label">Lore</div>
-  <h2>Such die Lore</h2>
+  <h2>Ab zur Box</h2>
   <p>
-    Finde die Loren auf dem Gelände.<br>
-    Dort ist auch die finale Cache-Box.<br>
-    Komm danach zurück zur Karte!
+    Bei N 53° 11.156' E 13° 08.398' findest du die Box versteckt.<br>
+    Komm danach gern nochmal hier her um die Karte zu beenden.
+    
   </p>
-  <details>
-    <summary>Spoiler: Koordinaten</summary>
-    <p style="margin:0.5rem 0 0;">N 53° 11.156′ E 13° 08.398′</p>
-  </details>
 </div>
 {% endif %}
 {% endmacro %}
@@ -162,7 +158,7 @@
 <div class="card">
   <div class="card-label">Geschafft!</div>
   <h2>Logbuch</h2>
-  <p>Trag dich ein – Jim Knopf würde sich freuen.</p>
+  <p>Trag dich ein - Jim Knopf würde sich freuen.</p>
   <form class="logbook-form" action="/logbook" method="post">
     <div>
       <label for="lb-name">Name</label>
